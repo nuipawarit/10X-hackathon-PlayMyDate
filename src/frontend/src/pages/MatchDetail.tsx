@@ -44,7 +44,7 @@ const ACTIVITY_ICONS: Record<string, string> = {
 
 export default function MatchDetail() {
   const { matchId } = useParams<{ matchId: string }>();
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const [partner, setPartner] = useState<Partner | null>(null);
   const [newMessage, setNewMessage] = useState('');
   const [intimacy, setIntimacy] = useState<Intimacy | null>(null);
@@ -58,8 +58,10 @@ export default function MatchDetail() {
   const { typingUsers, sendTyping, sendStopTyping } = useTypingIndicator(matchId, user?.id);
 
   useEffect(() => {
-    loadData();
-  }, [matchId]);
+    if (!authLoading && user && matchId) {
+      loadData();
+    }
+  }, [authLoading, user, matchId]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -121,7 +123,7 @@ export default function MatchDetail() {
     }
   };
 
-  if (loading) {
+  if (authLoading || loading) {
     return (
       <div className="h-[calc(100vh-120px)] flex flex-col gap-4">
         <div className="card">

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getMatches, findMatches } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 interface Match {
   match: {
@@ -41,14 +42,17 @@ function SkeletonCard() {
 }
 
 export default function Matches() {
+  const { user, isLoading: authLoading } = useAuth();
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
   const [finding, setFinding] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'info'; text: string } | null>(null);
 
   useEffect(() => {
-    loadMatches();
-  }, []);
+    if (!authLoading && user) {
+      loadMatches();
+    }
+  }, [authLoading, user]);
 
   useEffect(() => {
     if (message) {
@@ -90,7 +94,7 @@ export default function Matches() {
     }
   };
 
-  if (loading) {
+  if (authLoading || loading) {
     return (
       <div>
         <div className="flex items-center justify-between mb-6">
