@@ -1,17 +1,32 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from './AuthProvider';
+import { seedDatabase } from '@/lib/api';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { user, logout } = useAuth();
   const pathname = usePathname();
+  const [resetting, setResetting] = useState(false);
 
   const isActive = (path: string) => pathname.startsWith(path);
 
+  const handleResetDatabase = async () => {
+    if (resetting) return;
+    setResetting(true);
+    try {
+      await seedDatabase();
+      window.location.href = '/login';
+    } catch (error) {
+      console.error('Failed to reset database:', error);
+      setResetting(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen flex flex-col">
       <header className="glass sticky top-0 z-10 border-b border-white/20">
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link href="/matches" className="flex items-center gap-2 group">
@@ -70,11 +85,21 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-6">
+      <main className="flex-1 max-w-4xl mx-auto px-4 py-6 w-full">
         <div className="page-enter">
           {children}
         </div>
       </main>
+
+      <footer className="py-4 text-center">
+        <button
+          onClick={handleResetDatabase}
+          disabled={resetting}
+          className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+        >
+          {resetting ? 'Resetting...' : 'Reset Database'}
+        </button>
+      </footer>
     </div>
   );
 }

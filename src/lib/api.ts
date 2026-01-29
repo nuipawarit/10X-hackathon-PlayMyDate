@@ -320,3 +320,12 @@ function getLevel(score: number): number {
   if (score >= INTIMACY_THRESHOLDS.real_name) return 1;
   return 0;
 }
+
+// Database
+export const seedDatabase = async () => {
+  const res = await fetch('/api/seed', {
+    method: 'POST',
+    headers: { 'x-seed-key': 'dev-seed-key-123' },
+  });
+  return res.json();
+};

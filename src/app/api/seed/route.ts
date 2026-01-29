@@ -10,38 +10,51 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    // Clear existing data (order matters due to foreign keys)
+    await sql`DELETE FROM activity_instances`;
+    await sql`DELETE FROM messages`;
+    await sql`DELETE FROM intimacy_scores`;
+    await sql`DELETE FROM matches`;
+    await sql`DELETE FROM sessions`;
+    await sql`DELETE FROM users`;
+
     const passwordHash = await hashPassword('password123');
+
+    // Demo users matching original initial state
+    const aliceId = crypto.randomUUID();
+    const bobId = crypto.randomUUID();
+    const charlieId = crypto.randomUUID();
 
     const demoUsers = [
       {
-        id: crypto.randomUUID(),
+        id: aliceId,
         email: 'alice@demo.com',
         display_name: 'Alice',
-        playing_style: ['casual', 'story-driven'],
-        interests: ['RPG', 'puzzle', 'indie'],
-        bio: 'Love exploring new worlds in games!',
-        real_name: 'Alice Johnson',
-        occupation: 'Game Designer',
+        playing_style: ['casual', 'creative'],
+        interests: ['music', 'travel', 'cooking'],
+        bio: 'Love exploring new places and trying new recipes!',
+        real_name: 'Alice Smith',
+        occupation: 'UX Designer',
       },
       {
-        id: crypto.randomUUID(),
+        id: bobId,
         email: 'bob@demo.com',
         display_name: 'Bob',
-        playing_style: ['competitive', 'hardcore'],
-        interests: ['FPS', 'strategy', 'esports'],
-        bio: 'Always up for a challenge!',
-        real_name: 'Bob Smith',
+        playing_style: ['competitive', 'strategic'],
+        interests: ['gaming', 'tech', 'movies'],
+        bio: 'Gamer and tech enthusiast looking for meaningful connections.',
+        real_name: 'Bob Johnson',
         occupation: 'Software Engineer',
       },
       {
-        id: crypto.randomUUID(),
+        id: charlieId,
         email: 'charlie@demo.com',
         display_name: 'Charlie',
         playing_style: ['casual', 'social'],
-        interests: ['party games', 'co-op', 'simulation'],
-        bio: 'Games are better with friends!',
+        interests: ['music', 'art', 'hiking'],
+        bio: 'Artist who loves nature and good conversations.',
         real_name: 'Charlie Brown',
-        occupation: 'Marketing Manager',
+        occupation: 'Graphic Designer',
       },
     ];
 
@@ -51,51 +64,72 @@ export async function POST(request: NextRequest) {
         VALUES (${user.id}, ${user.email}, ${passwordHash}, ${user.display_name},
                 ${JSON.stringify(user.playing_style)}, ${JSON.stringify(user.interests)},
                 ${user.bio}, ${user.real_name}, ${user.occupation})
-        ON CONFLICT (email) DO NOTHING
       `;
     }
 
-    const usersResult = await sql`
-      SELECT id FROM users WHERE email IN ('alice@demo.com', 'bob@demo.com')
-      ORDER BY email
+    // Match 1: Alice ↔ Bob (score 85, intimacy 50, unlocks: real_name + photo)
+    const [ab1, ab2] = aliceId < bobId ? [aliceId, bobId] : [bobId, aliceId];
+    await sql`
+      INSERT INTO matches (user1_id, user2_id, compatibility_score, status)
+      VALUES (${ab1}, ${ab2}, 85, 'matched')
     `;
 
-    if (usersResult.rows.length >= 2) {
-      const aliceId = usersResult.rows[0].id;
-      const bobId = usersResult.rows[1].id;
+    const aliceBobMatch = await sql`
+      SELECT id FROM matches WHERE user1_id = ${ab1} AND user2_id = ${ab2}
+    `;
 
-      const [user1_id, user2_id] = aliceId < bobId ? [aliceId, bobId] : [bobId, aliceId];
+    if (aliceBobMatch.rows.length > 0) {
+      const matchId = aliceBobMatch.rows[0].id;
 
+      // Intimacy score 50
       await sql`
-        INSERT INTO matches (user1_id, user2_id, compatibility_score, status)
-        VALUES (${user1_id}, ${user2_id}, 75.5, 'matched')
-        ON CONFLICT (user1_id, user2_id) DO NOTHING
+        INSERT INTO intimacy_scores (match_id, score)
+        VALUES (${matchId}, 50)
+        ON CONFLICT (match_id) DO UPDATE SET score = 50
       `;
 
-      const matchResult = await sql`
-        SELECT id FROM matches WHERE user1_id = ${user1_id} AND user2_id = ${user2_id}
+      // 4 messages
+      await sql`
+        INSERT INTO messages (match_id, sender_id, content)
+        VALUES
+          (${matchId}, ${aliceId}, 'Hey! Nice to match with you 😊'),
+          (${matchId}, ${bobId}, 'Hi Alice! Love your profile, cooking is awesome!'),
+          (${matchId}, ${aliceId}, 'Thanks! What games do you play?'),
+          (${matchId}, ${bobId}, 'Mostly strategy games and some FPS. Do you game at all?')
       `;
-
-      if (matchResult.rows.length > 0) {
-        const matchId = matchResult.rows[0].id;
-
-        await sql`
-          INSERT INTO messages (match_id, sender_id, content)
-          VALUES
-            (${matchId}, ${aliceId}, 'Hey! I saw we both love RPGs!'),
-            (${matchId}, ${bobId}, 'Yes! Have you played any good ones lately?'),
-            (${matchId}, ${aliceId}, 'Just finished Baldur''s Gate 3, it was amazing!')
-          ON CONFLICT DO NOTHING
-        `;
-
-        await sql`
-          UPDATE intimacy_scores
-          SET score = 30
-          WHERE match_id = ${matchId}
-        `;
-      }
     }
 
+    // Match 2: Bob ↔ Charlie (score 72, intimacy 30, unlocks: real_name)
+    const [bc1, bc2] = bobId < charlieId ? [bobId, charlieId] : [charlieId, bobId];
+    await sql`
+      INSERT INTO matches (user1_id, user2_id, compatibility_score, status)
+      VALUES (${bc1}, ${bc2}, 72, 'matched')
+    `;
+
+    const bobCharlieMatch = await sql`
+      SELECT id FROM matches WHERE user1_id = ${bc1} AND user2_id = ${bc2}
+    `;
+
+    if (bobCharlieMatch.rows.length > 0) {
+      const matchId = bobCharlieMatch.rows[0].id;
+
+      // Intimacy score 30
+      await sql`
+        INSERT INTO intimacy_scores (match_id, score)
+        VALUES (${matchId}, 30)
+        ON CONFLICT (match_id) DO UPDATE SET score = 30
+      `;
+
+      // 2 messages
+      await sql`
+        INSERT INTO messages (match_id, sender_id, content)
+        VALUES
+          (${matchId}, ${bobId}, 'Hey Charlie! I see you like hiking too!'),
+          (${matchId}, ${charlieId}, 'Yeah! I try to go every weekend. Any favorite trails?')
+      `;
+    }
+
+    // Seed activities
     await sql`
       INSERT INTO activities (name, type, description, instructions, intimacy_points, config)
       VALUES
@@ -113,6 +147,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Seed error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    return NextResponse.json({ error: message, details: String(error) }, { status: 500 });
   }
 }
