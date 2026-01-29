@@ -1,15 +1,33 @@
 {
-  "name": "playmydate",
-  "version": "1.0.0",
+  "name": "nextjs-temp",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "cd src/frontend && npm run dev",
-    "build": "cd src/frontend && npm run build",
-    "install:frontend": "cd src/frontend && npm install",
-    "supabase:link": "supabase link --project-ref lsdefqyofecudbrwstcq",
-    "supabase:push": "supabase db push",
-    "supabase:deploy-functions": "supabase functions deploy match-find && supabase functions deploy match-unmatch && supabase functions deploy activity-start && supabase functions deploy activity-complete && supabase functions deploy intimacy-unlock",
-    "supabase:setup": "npm run supabase:push && npm run supabase:deploy-functions",
-    "deploy": "npm run supabase:setup && npm run build"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@lucia-auth/adapter-postgresql": "^3.1.2",
+    "@vercel/postgres": "^0.10.0",
+    "lucia": "^3.2.2",
+    "next": "16.1.6",
+    "oslo": "^1.2.1",
+    "pg": "^8.17.2",
+    "react": "19.2.3",
+    "react-dom": "19.2.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/pg": "^8.16.0",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "babel-plugin-react-compiler": "1.0.0",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.6",
+    "tailwindcss": "^4",
+    "typescript": "^5"
   }
 }
