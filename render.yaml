@@ -44,10 +44,12 @@ services:
           type: web
           property: url
 
+  # Redis
+  - type: redis
+    name: playmydate-redis
+    plan: free
+    maxmemoryPolicy: allkeys-lru
+
 databases:
   - name: playmydate-db
-    plan: free
-
-redis:
-  - name: playmydate-redis
     plan: free

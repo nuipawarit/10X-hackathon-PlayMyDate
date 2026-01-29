@@ -4,7 +4,8 @@
       "Bash(/Users/nhui/Projects/workshop-cursor/src/backend/test-api.sh)",
       "Bash(PGPASSWORD=playmydate123 psql:*)",
       "Bash(curl:*)",
-      "Bash(docker-compose exec:*)"
+      "Bash(docker-compose exec:*)",
+      "Bash(npm run build:*)"
     ]
   }
 }
