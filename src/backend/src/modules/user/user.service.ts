@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
 import { config } from '../../shared/config/index.js';
 import { AppError } from '../../shared/middleware/error.js';
 import * as userRepo from './user.repository.js';
@@ -85,7 +85,7 @@ export async function updatePrivateData(
 function generateToken(userId: string, email: string): string {
   return jwt.sign({ userId, email }, config.jwt.secret, {
     expiresIn: config.jwt.expiresIn,
-  });
+  } as SignOptions);
 }
 
 function sanitizeUser(user: any, includePrivate: boolean = false) {

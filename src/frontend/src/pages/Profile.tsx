@@ -50,7 +50,7 @@ export default function Profile() {
     setMessage('');
 
     try {
-      const profileRes = await updateProfile({
+      await updateProfile({
         display_name: displayName,
         bio,
         playing_style: playingStyle,
