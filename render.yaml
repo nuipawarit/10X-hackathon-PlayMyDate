@@ -21,10 +21,7 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: FRONTEND_URL
-        fromService:
-          name: playmydate-frontend
-          type: web
-          property: url
+        value: https://playmydate-frontend.onrender.com
 
   # Frontend
   - type: web
@@ -39,16 +36,16 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_URL
-        fromService:
-          name: playmydate-backend
-          type: web
-          property: url
+        value: https://playmydate-backend.onrender.com
 
   # Redis
   - type: redis
     name: playmydate-redis
     plan: free
     maxmemoryPolicy: allkeys-lru
+    ipAllowList:
+      - source: 0.0.0.0/0
+        description: Allow all (for Render internal services)
 
 databases:
   - name: playmydate-db
