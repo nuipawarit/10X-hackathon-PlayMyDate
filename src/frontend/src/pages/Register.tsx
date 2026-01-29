@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { register as registerApi } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
 export default function Register() {
@@ -9,7 +8,7 @@ export default function Register() {
   const [displayName, setDisplayName] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { register } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -18,11 +17,10 @@ export default function Register() {
     setLoading(true);
 
     try {
-      const response = await registerApi(email, password, displayName || undefined);
-      login(response.data.token, response.data.user);
+      await register(email, password, displayName || undefined);
       navigate('/profile');
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Registration failed');
+      setError(err.message || 'Registration failed');
     } finally {
       setLoading(false);
     }

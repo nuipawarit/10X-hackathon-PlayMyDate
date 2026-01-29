@@ -1,8 +1,23 @@
 # Project Specification Repository
+
 Repo นี้ใช้สำหรับ:
 - คิดงาน
 - เขียนเอกสาร
 - ใช้ Cursor (AI) ช่วยออกแบบและพัฒนา
+
+## PlayMyDate App
+
+### Production
+- **Live URL**: https://frontend-three-tau-40.vercel.app
+- **Demo Login**: alice@demo.com / password123
+
+### Technical Documentation
+See [src/README.md](src/README.md) for:
+- Tech stack & architecture
+- Development setup
+- Deployment guide
+
+---
 
 ## Workflow (สำคัญ)
 1. เขียน BRD (ภาษาคน)
@@ -21,7 +36,7 @@ _docs/ai/ai-all-prompt-templates.md
 Prompt สำหรับใช้งานระหว่าง workshop และ hackathon:
 - _docs/ai/prompt-cards/
 
-## 🧭 How to Use This Repo (Workshop)
+## How to Use This Repo (Workshop)
 1. อ่าน:
   - _docs/ai/AI-DOs-and-DONTs-1page.md
 2. ระหว่างทำงาน:

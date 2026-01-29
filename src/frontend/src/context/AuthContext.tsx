@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { getProfile } from '../services/api';
+import { supabase } from '../lib/supabase';
+import { Session } from '@supabase/supabase-js';
 
 interface User {
   id: string;
@@ -15,9 +16,10 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
-  token: string | null;
-  login: (token: string, user: User) => void;
-  logout: () => void;
+  session: Session | null;
+  login: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string, displayName?: string) => Promise<void>;
+  logout: () => Promise<void>;
   updateUser: (user: User) => void;
   isLoading: boolean;
 }
@@ -26,50 +28,87 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const storedToken = localStorage.getItem('token');
-    if (storedToken) {
-      setToken(storedToken);
-      getProfile()
-        .then((res) => {
-          setUser(res.data);
-        })
-        .catch(() => {
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
-    } else {
-      setIsLoading(false);
-    }
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if (session?.user) {
+        fetchProfile(session.user.id);
+      } else {
+        setIsLoading(false);
+      }
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      setSession(session);
+      if (session?.user) {
+        await fetchProfile(session.user.id);
+      } else {
+        setUser(null);
+        setIsLoading(false);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  const login = (newToken: string, newUser: User) => {
-    localStorage.setItem('token', newToken);
-    localStorage.setItem('user', JSON.stringify(newUser));
-    setToken(newToken);
-    setUser(newUser);
+  const fetchProfile = async (authId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('auth_id', authId)
+        .single();
+
+      if (error) throw error;
+      setUser(data as User);
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setToken(null);
+  const login = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) throw error;
+  };
+
+  const register = async (email: string, password: string, displayName?: string) => {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { display_name: displayName },
+      },
+    });
+
+    if (error) throw error;
+  };
+
+  const logout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
     setUser(null);
+    setSession(null);
   };
 
   const updateUser = (updatedUser: User) => {
-    localStorage.setItem('user', JSON.stringify(updatedUser));
     setUser(updatedUser);
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, updateUser, isLoading }}>
+    <AuthContext.Provider
+      value={{ user, session, login, register, logout, updateUser, isLoading }}
+    >
       {children}
     </AuthContext.Provider>
   );

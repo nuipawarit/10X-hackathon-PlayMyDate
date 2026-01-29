@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { login as loginApi } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
 export default function Login() {
@@ -17,11 +16,10 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const response = await loginApi(email, password);
-      login(response.data.token, response.data.user);
+      await login(email, password);
       navigate('/matches');
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Login failed');
+      setError(err.message || 'Login failed');
     } finally {
       setLoading(false);
     }
@@ -114,26 +112,6 @@ export default function Login() {
             Sign up
           </Link>
         </p>
-
-        <div className="mt-8 pt-6 border-t border-gray-100 animate-fade-in" style={{ animationDelay: '0.5s' }}>
-          <p className="text-xs text-gray-400 text-center mb-3">Demo accounts</p>
-          <div className="flex gap-2 justify-center">
-            <button
-              type="button"
-              onClick={() => { setEmail('alice@demo.com'); setPassword('password123'); }}
-              className="text-xs px-3 py-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
-            >
-              Alice
-            </button>
-            <button
-              type="button"
-              onClick={() => { setEmail('bob@demo.com'); setPassword('password123'); }}
-              className="text-xs px-3 py-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
-            >
-              Bob
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   );

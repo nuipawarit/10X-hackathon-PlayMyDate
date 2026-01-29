@@ -7,6 +7,8 @@ build/
 .next/
 out/
 
+.env
+
 # Logs
 logs/
 *.log
@@ -30,3 +32,12 @@ coverage/
 # Misc
 *.tsbuildinfo
 .turbo/
+
+# Supabase
+supabase/.temp/
+
+# Vercel
+.vercel/
+
+# Claude Code
+.claude/settings.local.json

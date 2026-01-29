@@ -1,0 +1,15 @@
+{
+  "name": "playmydate",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "cd src/frontend && npm run dev",
+    "build": "cd src/frontend && npm run build",
+    "install:frontend": "cd src/frontend && npm install",
+    "supabase:link": "supabase link --project-ref lsdefqyofecudbrwstcq",
+    "supabase:push": "supabase db push",
+    "supabase:deploy-functions": "supabase functions deploy match-find && supabase functions deploy match-unmatch && supabase functions deploy activity-start && supabase functions deploy activity-complete && supabase functions deploy intimacy-unlock",
+    "supabase:setup": "npm run supabase:push && npm run supabase:deploy-functions",
+    "deploy": "npm run supabase:setup && npm run build"
+  }
+}

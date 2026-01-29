@@ -15,7 +15,7 @@ interface Match {
     playing_style: string[];
     interests: string[];
     bio: string | null;
-  };
+  } | null;
 }
 
 function SkeletonCard() {
@@ -175,7 +175,7 @@ export default function Matches() {
         </div>
       ) : (
         <div className="space-y-4">
-          {matches.map(({ match, partner }, index) => (
+          {matches.filter(m => m.partner !== null).map(({ match, partner }, index) => (
             <Link
               key={match.id}
               to={`/matches/${match.id}`}
@@ -184,17 +184,17 @@ export default function Matches() {
             >
               <div className="flex items-center gap-4">
                 <div className="avatar w-16 h-16 text-2xl">
-                  {partner.display_name?.[0]?.toUpperCase() || '?'}
+                  {partner?.display_name?.[0]?.toUpperCase() || '?'}
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="font-semibold text-lg text-gray-800">
-                    {partner.display_name || 'Anonymous'}
+                    {partner?.display_name || 'Anonymous'}
                   </h3>
                   <p className="text-sm text-gray-500 line-clamp-1">
-                    {partner.bio || 'Ready to connect through activities'}
+                    {partner?.bio || 'Ready to connect through activities'}
                   </p>
                   <div className="flex flex-wrap gap-2 mt-2">
-                    {partner.interests.slice(0, 3).map((interest) => (
+                    {partner?.interests?.slice(0, 3).map((interest) => (
                       <span
                         key={interest}
                         className="text-xs bg-primary-50 text-primary-600 px-2.5 py-1 rounded-full"
@@ -202,9 +202,9 @@ export default function Matches() {
                         {interest}
                       </span>
                     ))}
-                    {partner.interests.length > 3 && (
+                    {(partner?.interests?.length || 0) > 3 && (
                       <span className="text-xs text-gray-400">
-                        +{partner.interests.length - 3} more
+                        +{(partner?.interests?.length || 0) - 3} more
                       </span>
                     )}
                   </div>

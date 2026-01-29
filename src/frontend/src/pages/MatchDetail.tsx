@@ -1,15 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { io, Socket } from 'socket.io-client';
 import {
   getMatch,
-  getMessages,
-  sendMessage,
   getIntimacy,
   getAvailableActivities,
   unlock,
 } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useRealtimeMessages } from '../hooks/useRealtimeMessages';
+import { useTypingIndicator } from '../hooks/useTypingIndicator';
 
 interface Partner {
   id: string;
@@ -17,13 +16,6 @@ interface Partner {
   playing_style: string[];
   interests: string[];
   bio: string | null;
-}
-
-interface Message {
-  id: string;
-  sender_id: string;
-  content: string;
-  created_at: string;
 }
 
 interface Activity {
@@ -52,9 +44,8 @@ const ACTIVITY_ICONS: Record<string, string> = {
 
 export default function MatchDetail() {
   const { matchId } = useParams<{ matchId: string }>();
-  const { user, token } = useAuth();
+  const { user } = useAuth();
   const [partner, setPartner] = useState<Partner | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [intimacy, setIntimacy] = useState<Intimacy | null>(null);
   const [activities, setActivities] = useState<Activity[]>([]);
@@ -62,51 +53,27 @@ export default function MatchDetail() {
   const [showActivities, setShowActivities] = useState(false);
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const socketRef = useRef<Socket | null>(null);
+
+  const { messages, sendMessage: sendRealtimeMessage } = useRealtimeMessages(matchId);
+  const { typingUsers, sendTyping, sendStopTyping } = useTypingIndicator(matchId, user?.id);
 
   useEffect(() => {
     loadData();
-    setupSocket();
-
-    return () => {
-      if (socketRef.current) {
-        socketRef.current.emit('leave_match', matchId);
-        socketRef.current.disconnect();
-      }
-    };
   }, [matchId]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const setupSocket = () => {
-    const socket = io(import.meta.env.VITE_API_URL || '/', {
-      auth: { token },
-    });
-
-    socket.on('connect', () => {
-      socket.emit('join_match', matchId);
-    });
-
-    socket.on('new_message', (data: { message: Message }) => {
-      setMessages((prev) => [...prev, data.message]);
-    });
-
-    socketRef.current = socket;
-  };
-
   const loadData = async () => {
     try {
-      const [matchRes, messagesRes, intimacyRes, activitiesRes] = await Promise.all([
+      const [matchRes, intimacyRes, activitiesRes] = await Promise.all([
         getMatch(matchId!),
-        getMessages(matchId!),
         getIntimacy(matchId!),
         getAvailableActivities(matchId!),
       ]);
 
       setPartner(matchRes.data.partner);
-      setMessages(messagesRes.data.messages);
       setIntimacy(intimacyRes.data);
       setActivities(activitiesRes.data);
     } catch (error) {
@@ -118,12 +85,12 @@ export default function MatchDetail() {
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || sending) return;
+    if (!newMessage.trim() || sending || !user) return;
 
     setSending(true);
+    sendStopTyping();
     try {
-      const response = await sendMessage(matchId!, newMessage);
-      setMessages((prev) => [...prev, response.data]);
+      await sendRealtimeMessage(newMessage, user.id);
       setNewMessage('');
 
       const intimacyRes = await getIntimacy(matchId!);
@@ -132,6 +99,15 @@ export default function MatchDetail() {
       console.error('Failed to send message:', error);
     } finally {
       setSending(false);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewMessage(e.target.value);
+    if (e.target.value) {
+      sendTyping();
+    } else {
+      sendStopTyping();
     }
   };
 
@@ -319,6 +295,13 @@ export default function MatchDetail() {
                 </div>
               </div>
             ))}
+            {typingUsers.length > 0 && (
+              <div className="flex justify-start">
+                <div className="message-bubble-received bg-gray-100">
+                  <span className="animate-pulse">typing...</span>
+                </div>
+              </div>
+            )}
             <div ref={messagesEndRef} />
           </div>
         )}
@@ -329,7 +312,8 @@ export default function MatchDetail() {
         <input
           type="text"
           value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
+          onChange={handleInputChange}
+          onBlur={sendStopTyping}
           className="input flex-1"
           placeholder="Type a message..."
         />
