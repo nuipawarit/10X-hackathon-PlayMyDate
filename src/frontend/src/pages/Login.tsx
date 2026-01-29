@@ -112,6 +112,36 @@ export default function Login() {
             Sign up
           </Link>
         </p>
+
+        {/* Demo Accounts */}
+        <div className="mt-6 pt-6 border-t border-gray-100 animate-fade-in" style={{ animationDelay: '0.5s' }}>
+          <p className="text-xs text-gray-400 text-center mb-3">Demo Accounts (click to fill)</p>
+          <div className="space-y-2">
+            {[
+              { email: 'alice@demo.com', name: 'Alice' },
+              { email: 'bob@demo.com', name: 'Bob' },
+              { email: 'charlie@demo.com', name: 'Charlie' },
+            ].map((demo) => (
+              <button
+                key={demo.email}
+                type="button"
+                onClick={() => {
+                  setEmail(demo.email);
+                  setPassword('password123');
+                }}
+                className="w-full text-left px-3 py-2 text-sm bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors flex items-center justify-between"
+              >
+                <span>
+                  <span className="font-medium text-gray-700">{demo.name}</span>
+                  <span className="text-gray-400 ml-2 text-xs">{demo.email}</span>
+                </span>
+                <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
