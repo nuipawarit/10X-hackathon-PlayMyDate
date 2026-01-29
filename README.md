@@ -8,7 +8,7 @@ Repo นี้ใช้สำหรับ:
 ## PlayMyDate App
 
 ### Production
-- **Live URL**: https://frontend-three-tau-40.vercel.app
+- **Live URL**: https://playmydate.vercel.app
 - **Demo Login**: alice@demo.com / password123
 
 ### Technical Documentation

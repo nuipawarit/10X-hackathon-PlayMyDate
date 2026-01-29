@@ -4,7 +4,7 @@ Dating app ที่ match users ผ่าน activities และ progressive d
 
 ## Production
 
-- **URL**: https://frontend-three-tau-40.vercel.app
+- **URL**: https://playmydate.vercel.app
 - **Demo**: alice@demo.com / password123
 
 ## Tech Stack
