@@ -1,17 +1,32 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from './AuthProvider';
-import { seedDatabase } from '@/lib/api';
+import { seedDatabase, getWallet } from '@/lib/api';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { user, logout } = useAuth();
   const pathname = usePathname();
   const [resetting, setResetting] = useState(false);
+  const [walletBalance, setWalletBalance] = useState<number | null>(null);
 
   const isActive = (path: string) => pathname.startsWith(path);
+
+  useEffect(() => {
+    const fetchWallet = async () => {
+      try {
+        const { data } = await getWallet();
+        setWalletBalance(data.balance);
+      } catch {
+        // Wallet may not exist yet
+      }
+    };
+    if (user) {
+      fetchWallet();
+    }
+  }, [user, pathname]);
 
   const handleResetDatabase = async () => {
     if (resetting) return;
@@ -60,6 +75,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 </svg>
                 Profile
               </span>
+            </Link>
+
+            <Link
+              href="/wallet"
+              className={`${isActive('/wallet') || isActive('/rewards') ? 'nav-link-active' : 'nav-link-inactive'} flex items-center gap-1`}
+            >
+              <span className="text-yellow-500">🪙</span>
+              <span className="font-medium">{walletBalance !== null ? walletBalance.toLocaleString() : '...'}</span>
             </Link>
 
             <div className="flex items-center gap-3 ml-2 pl-4 border-l border-gray-200">

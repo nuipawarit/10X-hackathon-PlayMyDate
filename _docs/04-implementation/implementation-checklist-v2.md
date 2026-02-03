@@ -69,58 +69,58 @@
 
 #### Users Table
 
-- [ ] Add `avatar_config` JSONB column
-- [ ] Add `voice_note_url` TEXT column
-- [ ] Add `behavioral_persona` VARCHAR(50) column
-- [ ] Add `subscription_tier` VARCHAR(20) DEFAULT 'free'
-- [ ] Add `subscription_expires_at` TIMESTAMP column
-- [ ] Add `referral_code` VARCHAR(50) UNIQUE column
-- [ ] Add `referred_by_user_id` UUID FK column
-- [ ] Add `is_active` BOOLEAN DEFAULT true column
-- [ ] Create index on `referral_code`
-- [ ] Update Drizzle schema for users
+- [x] Add `avatar_config` JSONB column
+- [x] Add `voice_note_url` TEXT column
+- [x] Add `behavioral_persona` VARCHAR(50) column
+- [x] Add `subscription_tier` VARCHAR(20) DEFAULT 'free'
+- [x] Add `subscription_expires_at` TIMESTAMP column
+- [x] Add `referral_code` VARCHAR(50) UNIQUE column
+- [x] Add `referred_by_user_id` UUID FK column
+- [x] Add `is_active` BOOLEAN DEFAULT true column
+- [x] Create index on `referral_code`
+- [x] Update Drizzle schema for users
 
 #### Matches Table
 
-- [ ] Add `chemistry_score` INTEGER DEFAULT 0 column
-- [ ] Add `mission_streak` INTEGER DEFAULT 0 column
-- [ ] Add `paradise_mode_unlocked` BOOLEAN DEFAULT false column
-- [ ] Add `paradise_mode_unlocked_at` TIMESTAMP column
-- [ ] Add `last_activity_at` TIMESTAMP DEFAULT NOW() column
-- [ ] Create index on `status`
-- [ ] Update Drizzle schema for matches
+- [x] Add `chemistry_score` INTEGER DEFAULT 0 column
+- [x] Add `mission_streak` INTEGER DEFAULT 0 column
+- [x] Add `paradise_mode_unlocked` BOOLEAN DEFAULT false column
+- [x] Add `paradise_mode_unlocked_at` TIMESTAMP column
+- [x] Add `last_activity_at` TIMESTAMP DEFAULT NOW() column
+- [x] Create index on `status`
+- [x] Update Drizzle schema for matches
 
 #### Activities Table
 
-- [ ] Add `coin_reward` INTEGER DEFAULT 0 column
-- [ ] Add `difficulty_level` INTEGER DEFAULT 1 column
-- [ ] Add `estimated_duration_minutes` INTEGER DEFAULT 10 column
-- [ ] Add `is_branded` BOOLEAN DEFAULT false column
-- [ ] Add `sponsor_merchant_id` UUID column (FK added later)
-- [ ] Update Drizzle schema for activities
+- [x] Add `coin_reward` INTEGER DEFAULT 0 column
+- [x] Add `difficulty_level` INTEGER DEFAULT 1 column
+- [x] Add `estimated_duration_minutes` INTEGER DEFAULT 10 column
+- [x] Add `is_branded` BOOLEAN DEFAULT false column
+- [x] Add `sponsor_merchant_id` UUID column (FK added later)
+- [x] Update Drizzle schema for activities
 
 #### Activity Instances Table
 
-- [ ] Add `coins_earned` INTEGER DEFAULT 0 column
-- [ ] Add `expires_at` TIMESTAMP column
-- [ ] Update Drizzle schema for activity_instances
+- [x] Add `coins_earned` INTEGER DEFAULT 0 column
+- [x] Add `expires_at` TIMESTAMP column
+- [x] Update Drizzle schema for activity_instances
 
 #### Messages Table
 
-- [ ] Add `message_type` VARCHAR(20) DEFAULT 'text' column
-- [ ] Add `read_at` TIMESTAMP column
-- [ ] Update Drizzle schema for messages
+- [x] Add `message_type` VARCHAR(20) DEFAULT 'text' column
+- [x] Add `read_at` TIMESTAMP column
+- [x] Update Drizzle schema for messages
 
 ### 1.2 PlayCoin Domain - New Tables
 
-- [ ] Create `playcoin_wallets` table
+- [x] Create `playcoin_wallets` table
   - `id` UUID PK
   - `user_id` UUID UNIQUE FK
   - `balance` INTEGER DEFAULT 0
   - `lifetime_earned` INTEGER DEFAULT 0
   - `lifetime_spent` INTEGER DEFAULT 0
   - `created_at`, `updated_at` TIMESTAMP
-- [ ] Create `playcoin_transactions` table
+- [x] Create `playcoin_transactions` table
   - `id` UUID PK
   - `wallet_id` UUID FK
   - `type` VARCHAR(20) (earn, burn, purchase, exchange)
@@ -130,7 +130,7 @@
   - `reference_id` UUID
   - `metadata` JSONB
   - `created_at` TIMESTAMP
-- [ ] Create `daily_checkins` table
+- [x] Create `daily_checkins` table
   - `id` UUID PK
   - `user_id` UUID FK
   - `checkin_date` DATE
@@ -138,7 +138,7 @@
   - `coins_earned` INTEGER
   - `created_at` TIMESTAMP
   - UNIQUE(user_id, checkin_date)
-- [ ] Create `rewards` table
+- [x] Create `rewards` table
   - `id` UUID PK
   - `name` VARCHAR(255)
   - `description` TEXT
@@ -149,101 +149,101 @@
   - `is_active` BOOLEAN
   - `metadata` JSONB
   - `created_at` TIMESTAMP
-- [ ] Create `user_rewards` table
+- [x] Create `user_rewards` table
   - `id` UUID PK
   - `user_id` UUID FK
   - `reward_id` UUID FK
   - `transaction_id` UUID FK
   - `status` VARCHAR(20) (redeemed, used, expired)
   - `redeemed_at`, `used_at`, `expires_at` TIMESTAMP
-- [ ] Create Drizzle schema: `/src/lib/db/schema/playcoin.ts`
-- [ ] Create indexes for all new tables
-- [ ] Initialize wallets for existing users (migration script)
+- [x] Create Drizzle schema: `/src/lib/db/schema/playcoin.ts`
+- [x] Create indexes for all new tables
+- [x] Initialize wallets for existing users (migration script)
 
 ### 1.3 PlayCoin Services
 
-- [ ] Create `/src/lib/services/playcoin.ts`
-  - [ ] `getWallet(userId)` - Get user wallet
-  - [ ] `earnCoins(userId, amount, source, referenceId)` - Add coins
-  - [ ] `burnCoins(userId, amount, source, referenceId)` - Deduct coins
-  - [ ] `getTransactionHistory(userId, pagination)` - List transactions
-- [ ] Create `/src/lib/services/checkin.ts`
-  - [ ] `performDailyCheckin(userId)` - Execute daily check-in
-  - [ ] `getCheckinStatus(userId)` - Get today's status + streak
-  - [ ] `calculateStreakBonus(streakCount)` - Calculate bonus coins
-- [ ] Create `/src/lib/services/reward.ts`
-  - [ ] `getRewardCatalog(filters)` - List available rewards
-  - [ ] `redeemReward(userId, rewardId)` - Redeem a reward
-  - [ ] `getUserRewards(userId)` - List user's redeemed rewards
+- [x] Create `/src/lib/services/playcoin.ts`
+  - [x] `getWallet(userId)` - Get user wallet
+  - [x] `earnCoins(userId, amount, source, referenceId)` - Add coins
+  - [x] `burnCoins(userId, amount, source, referenceId)` - Deduct coins
+  - [x] `getTransactionHistory(userId, pagination)` - List transactions
+- [x] Create `/src/lib/services/checkin.ts`
+  - [x] `performDailyCheckin(userId)` - Execute daily check-in
+  - [x] `getCheckinStatus(userId)` - Get today's status + streak
+  - [x] `calculateStreakBonus(streakCount)` - Calculate bonus coins
+- [x] Create `/src/lib/services/reward.ts`
+  - [x] `getRewardCatalog(filters)` - List available rewards
+  - [x] `redeemReward(userId, rewardId)` - Redeem a reward
+  - [x] `getUserRewards(userId)` - List user's redeemed rewards
 
 ### 1.4 PlayCoin API Routes
 
-- [ ] Create `GET /api/playcoin/wallet/route.ts` - Get wallet balance
-- [ ] Create `GET /api/playcoin/transactions/route.ts` - Transaction history
-- [ ] Create `POST /api/playcoin/checkin/route.ts` - Daily check-in
-- [ ] Create `GET /api/playcoin/rewards/route.ts` - Reward catalog
-- [ ] Create `POST /api/playcoin/redeem/route.ts` - Redeem reward
-- [ ] Create `GET /api/playcoin/user-rewards/route.ts` - User's rewards
+- [x] Create `GET /api/playcoin/wallet/route.ts` - Get wallet balance
+- [x] Create `GET /api/playcoin/transactions/route.ts` - Transaction history
+- [x] Create `POST /api/playcoin/checkin/route.ts` - Daily check-in
+- [x] Create `GET /api/playcoin/rewards/route.ts` - Reward catalog
+- [x] Create `POST /api/playcoin/redeem/route.ts` - Redeem reward
+- [x] Create `GET /api/playcoin/user-rewards/route.ts` - User's rewards
 
 ### 1.5 Chemistry Meter Enhancement
 
-- [ ] Create `/src/lib/services/chemistry.ts`
-  - [ ] `calculateChemistryScore(matchId)` - Calculate score from interactions
-  - [ ] `updateChemistryOnAction(matchId, actionType)` - Update on action
-  - [ ] `applyChemistryDecay(matchId)` - Apply decay for inactivity
-  - [ ] `checkUnlockEligibility(matchId)` - Check unlock thresholds
-- [ ] Update `/api/activities/complete/route.ts`
-  - [ ] Award coins on completion
-  - [ ] Update chemistry score
-  - [ ] Track mission streaks
+- [x] Create `/src/lib/services/chemistry.ts`
+  - [x] `calculateChemistryScore(matchId)` - Calculate score from interactions
+  - [x] `updateChemistryOnAction(matchId, actionType)` - Update on action
+  - [x] `applyChemistryDecay(matchId)` - Apply decay for inactivity
+  - [x] `checkUnlockEligibility(matchId)` - Check unlock thresholds
+- [x] Update `/api/activities/complete/route.ts`
+  - [x] Award coins on completion
+  - [x] Update chemistry score
+  - [x] Track mission streaks
 - [ ] Create chemistry decay background job (Vercel CRON)
 
 ### 1.6 Daily Missions System
 
-- [ ] Create mission assignment logic
-  - [ ] Assign 3 missions per match daily
-  - [ ] Rotate missions each day
-  - [ ] Track completion status
-- [ ] Create `GET /api/activities/daily-missions/route.ts`
-- [ ] Update activity completion for mission tracking
-- [ ] Implement streak bonus calculation
+- [x] Create mission assignment logic
+  - [x] Assign 3 missions per match daily
+  - [x] Rotate missions each day
+  - [x] Track completion status
+- [x] Create `GET /api/activities/daily-missions/route.ts`
+- [x] Update activity completion for mission tracking
+- [x] Implement streak bonus calculation
 
 ### 1.7 Avatar Builder
 
-- [ ] Define AvatarConfig TypeScript interface
-- [ ] Create `POST /api/users/avatar/route.ts` - Save avatar
-- [ ] Create `GET /api/users/avatar/route.ts` - Get avatar
-- [ ] Create `/src/components/profile/AvatarBuilder.tsx`
+- [x] Define AvatarConfig TypeScript interface
+- [x] Create `POST /api/users/avatar/route.ts` - Save avatar
+- [x] Create `GET /api/users/avatar/route.ts` - Get avatar
+- [x] Create `/src/components/profile/AvatarBuilder.tsx`
 - [ ] Add avatar builder to profile page
 
 ### 1.8 Frontend Updates - Phase 1
 
 #### Wallet Components
 
-- [ ] Create `/src/components/wallet/WalletBalance.tsx`
-- [ ] Create `/src/components/wallet/TransactionHistory.tsx`
-- [ ] Create `/src/components/wallet/DailyCheckin.tsx`
-- [ ] Create `/src/components/wallet/StreakIndicator.tsx`
-- [ ] Create `/src/components/wallet/index.ts`
+- [x] Create `/src/components/wallet/WalletBalance.tsx`
+- [x] Create `/src/components/wallet/TransactionHistory.tsx`
+- [x] Create `/src/components/wallet/DailyCheckin.tsx`
+- [x] Create `/src/components/wallet/StreakIndicator.tsx`
+- [x] Create `/src/components/wallet/index.ts`
 
 #### Reward Components
 
-- [ ] Create `/src/components/rewards/RewardCatalog.tsx`
-- [ ] Create `/src/components/rewards/RewardCard.tsx`
-- [ ] Create `/src/components/rewards/RedeemConfirmation.tsx`
-- [ ] Create `/src/components/rewards/index.ts`
+- [x] Create `/src/components/rewards/RewardCatalog.tsx`
+- [x] Create `/src/components/rewards/RewardCard.tsx`
+- [x] Create `/src/components/rewards/RedeemConfirmation.tsx`
+- [x] Create `/src/components/rewards/index.ts`
 
 #### New Pages
 
-- [ ] Create `/src/app/(authenticated)/wallet/page.tsx`
-- [ ] Create `/src/app/(authenticated)/rewards/page.tsx`
+- [x] Create `/src/app/(authenticated)/wallet/page.tsx`
+- [x] Create `/src/app/(authenticated)/rewards/page.tsx`
 
 #### Update Existing
 
 - [ ] Add chemistry meter to match detail page
 - [ ] Add coin rewards display to activity completion
 - [ ] Update profile page with avatar builder
-- [ ] Add wallet balance to header/layout
+- [x] Add wallet balance to header/layout
 
 ---
 

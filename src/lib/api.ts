@@ -161,6 +161,29 @@ export const updatePrivateData = async (privateData: {
   return { data: data.profile };
 };
 
+// Avatar
+export type AvatarConfig = {
+  style: 'cartoon' | 'realistic' | 'pixel';
+  hairColor: string;
+  hairStyle: string;
+  skinTone: string;
+  accessories: string[];
+  background: string;
+};
+
+export const getAvatar = async () => {
+  const data = await fetchApi<{ avatarConfig: AvatarConfig | null }>('/api/users/avatar');
+  return { data: data.avatarConfig };
+};
+
+export const saveAvatar = async (avatarConfig: AvatarConfig) => {
+  const data = await fetchApi<{ avatarConfig: AvatarConfig }>('/api/users/avatar', {
+    method: 'POST',
+    body: JSON.stringify({ avatarConfig }),
+  });
+  return { data: data.avatarConfig };
+};
+
 // Matches
 export const getMatches = async () => {
   const data = await fetchApi<{ matches: Array<{ id: string; user1_id: string; user2_id: string; compatibility_score: number; status: string; created_at: string; updated_at: string; partner: Partner }> }>('/api/matches');
@@ -237,10 +260,27 @@ export const startActivity = async (matchId: string, activityId: string) => {
 };
 
 export const completeActivity = async (instanceId: string, result: Record<string, unknown>) => {
-  const data = await fetchApi<{ instance: ActivityInstance }>('/api/activities/complete', {
+  const data = await fetchApi<{ instance: ActivityInstance; coinsEarned?: number }>('/api/activities/complete', {
     method: 'POST',
     body: JSON.stringify({ instanceId, result }),
   });
+  return { data };
+};
+
+export type DailyMission = Activity & {
+  isCompleted: boolean;
+  isInProgress: boolean;
+  instanceId: string | null;
+};
+
+export const getDailyMissions = async (matchId: string) => {
+  const data = await fetchApi<{
+    missions: DailyMission[];
+    completedCount: number;
+    totalMissions: number;
+    allCompleted: boolean;
+    date: string;
+  }>(`/api/activities/daily-missions?matchId=${matchId}`);
   return { data };
 };
 
@@ -320,6 +360,107 @@ function getLevel(score: number): number {
   if (score >= INTIMACY_THRESHOLDS.real_name) return 1;
   return 0;
 }
+
+// PlayCoin
+export type Wallet = {
+  id: string;
+  user_id: string;
+  balance: number;
+  lifetime_earned: number;
+  lifetime_spent: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type Transaction = {
+  id: string;
+  wallet_id: string;
+  type: 'earn' | 'burn' | 'purchase' | 'exchange';
+  amount: number;
+  balance_after: number;
+  source: string | null;
+  reference_id: string | null;
+  created_at: string;
+};
+
+export type CheckinStatus = {
+  checkedInToday: boolean;
+  currentStreak: number;
+  lastCheckin: {
+    id: string;
+    checkin_date: string;
+    streak_count: number;
+    coins_earned: number;
+  } | null;
+};
+
+export type Reward = {
+  id: string;
+  name: string;
+  description: string | null;
+  type: string;
+  coin_cost: number;
+  stock_quantity: number | null;
+  is_active: boolean;
+};
+
+export type UserReward = {
+  id: string;
+  user_id: string;
+  reward_id: string;
+  status: string;
+  redeemed_at: string;
+  used_at: string | null;
+  expires_at: string | null;
+  reward: Reward;
+};
+
+export const getWallet = async () => {
+  const data = await fetchApi<{ wallet: Wallet }>('/api/playcoin/wallet');
+  return { data: data.wallet };
+};
+
+export const getTransactions = async (limit = 20, offset = 0) => {
+  const data = await fetchApi<{ transactions: Transaction[]; total: number }>(
+    `/api/playcoin/transactions?limit=${limit}&offset=${offset}`
+  );
+  return { data };
+};
+
+export const getCheckinStatus = async () => {
+  const data = await fetchApi<CheckinStatus>('/api/playcoin/checkin');
+  return { data };
+};
+
+export const performCheckin = async () => {
+  const data = await fetchApi<{ checkin: { id: string; checkin_date: string; streak_count: number; coins_earned: number }; coinsEarned: number; newStreak: number }>(
+    '/api/playcoin/checkin',
+    { method: 'POST' }
+  );
+  return { data };
+};
+
+export const getRewards = async () => {
+  const data = await fetchApi<{ rewards: Reward[] }>('/api/playcoin/rewards');
+  return { data: data.rewards };
+};
+
+export const redeemReward = async (rewardId: string) => {
+  const data = await fetchApi<{ userReward: UserReward; reward: Reward }>(
+    '/api/playcoin/redeem',
+    {
+      method: 'POST',
+      body: JSON.stringify({ rewardId }),
+    }
+  );
+  return { data };
+};
+
+export const getUserRewards = async (status?: 'redeemed' | 'used' | 'expired') => {
+  const params = status ? `?status=${status}` : '';
+  const data = await fetchApi<{ userRewards: UserReward[] }>(`/api/playcoin/user-rewards${params}`);
+  return { data: data.userRewards };
+};
 
 // Database
 export const seedDatabase = async () => {

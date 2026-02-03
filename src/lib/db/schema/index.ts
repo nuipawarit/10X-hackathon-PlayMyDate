@@ -4,3 +4,4 @@ export * from './messages';
 export * from './activities';
 export * from './intimacy';
 export * from './typing';
+export * from './playcoin';

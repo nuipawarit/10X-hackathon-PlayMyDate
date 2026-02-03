@@ -1,4 +1,13 @@
-import { pgTable, uuid, varchar, text, timestamp, jsonb } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, varchar, text, timestamp, jsonb, boolean } from 'drizzle-orm/pg-core';
+
+export interface AvatarConfig {
+  style: 'cartoon' | 'realistic' | 'pixel';
+  hairColor: string;
+  hairStyle: string;
+  skinTone: string;
+  accessories: string[];
+  background: string;
+}
 
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -12,6 +21,14 @@ export const users = pgTable('users', {
   photoUrl: text('photo_url'),
   occupation: varchar('occupation', { length: 100 }),
   phone: varchar('phone', { length: 20 }),
+  avatarConfig: jsonb('avatar_config').$type<AvatarConfig>(),
+  voiceNoteUrl: text('voice_note_url'),
+  behavioralPersona: varchar('behavioral_persona', { length: 50 }),
+  subscriptionTier: varchar('subscription_tier', { length: 20 }).default('free'),
+  subscriptionExpiresAt: timestamp('subscription_expires_at'),
+  referralCode: varchar('referral_code', { length: 50 }).unique(),
+  referredByUserId: uuid('referred_by_user_id'),
+  isActive: boolean('is_active').default(true),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });

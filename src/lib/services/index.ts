@@ -4,3 +4,7 @@ export * from './matching';
 export * from './activity';
 export * from './communication';
 export * from './intimacy';
+export * from './playcoin';
+export * from './checkin';
+export * from './reward';
+export * from './chemistry';

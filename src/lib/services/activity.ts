@@ -1,6 +1,8 @@
 import { sql, type Activity, type ActivityInstance } from '@/lib/db';
 import { success, failure, type ServiceResult } from './types';
 import { addIntimacyPoints } from './intimacy';
+import { earnCoins } from './playcoin';
+import { updateChemistryOnAction, updateMissionStreak } from './chemistry';
 
 export async function getAllActivities(): Promise<ServiceResult<Activity[]>> {
   try {
@@ -115,10 +117,10 @@ export async function completeActivity(
   userId: string,
   instanceId: string,
   result?: Record<string, unknown>
-): Promise<ServiceResult<{ instance: ActivityInstance; intimacyAdded: number }>> {
+): Promise<ServiceResult<{ instance: ActivityInstance; intimacyAdded: number; coinsEarned: number }>> {
   try {
     const instanceResult = await sql`
-      SELECT ai.*, a.intimacy_points
+      SELECT ai.*, a.intimacy_points, a.coin_reward
       FROM activity_instances ai
       JOIN activities a ON ai.activity_id = a.id
       JOIN matches m ON ai.match_id = m.id
@@ -132,24 +134,34 @@ export async function completeActivity(
     }
 
     const instance = instanceResult.rows[0];
-    const intimacyPoints = instance.intimacy_points || 0;
+    const intimacyPoints = (instance.intimacy_points as number) || 0;
+    const coinReward = (instance.coin_reward as number) || 0;
 
     const updateResult = await sql`
       UPDATE activity_instances
       SET status = 'completed',
           completed_at = NOW(),
+          coins_earned = ${coinReward},
           result = ${result ? JSON.stringify(result) : null}::jsonb
       WHERE id = ${instanceId}
       RETURNING *
     `;
 
     if (intimacyPoints > 0) {
-      await addIntimacyPoints(instance.match_id, intimacyPoints);
+      await addIntimacyPoints(instance.match_id as string, intimacyPoints);
     }
+
+    if (coinReward > 0) {
+      await earnCoins(userId, coinReward, 'activity_complete', instanceId);
+    }
+
+    await updateChemistryOnAction(instance.match_id as string, 'activity_complete');
+    await updateMissionStreak(instance.match_id as string, true);
 
     return success({
       instance: updateResult.rows[0] as ActivityInstance,
       intimacyAdded: intimacyPoints,
+      coinsEarned: coinReward,
     });
   } catch (error) {
     console.error('completeActivity error:', error);
