@@ -10,56 +10,56 @@
 
 ### 0.1 Drizzle ORM Setup
 
-- [ ] Install dependencies: `drizzle-orm`, `drizzle-kit`, `zod`
-- [ ] Create directory structure: `/src/lib/db/schema/`
-- [ ] Create Drizzle schema for `users` table
-- [ ] Create Drizzle schema for `sessions` table
-- [ ] Create Drizzle schema for `matches` table
-- [ ] Create Drizzle schema for `messages` table
-- [ ] Create Drizzle schema for `activities` table
-- [ ] Create Drizzle schema for `activity_instances` table
-- [ ] Create Drizzle schema for `intimacy_scores` table
-- [ ] Create Drizzle schema for `typing_status` table
-- [ ] Create `/src/lib/db/index.ts` - Drizzle client export
-- [ ] Configure `drizzle.config.ts` for Neon PostgreSQL
-- [ ] Test Drizzle queries work alongside existing raw SQL
+- [x] Install dependencies: `drizzle-orm`, `drizzle-kit`, `zod`
+- [x] Create directory structure: `/src/lib/db/schema/`
+- [x] Create Drizzle schema for `users` table
+- [x] Create Drizzle schema for `sessions` table
+- [x] Create Drizzle schema for `matches` table
+- [x] Create Drizzle schema for `messages` table
+- [x] Create Drizzle schema for `activities` table
+- [x] Create Drizzle schema for `activity_instances` table
+- [x] Create Drizzle schema for `intimacy_scores` table
+- [x] Create Drizzle schema for `typing_status` table
+- [x] Create `/src/lib/db/index.ts` - Drizzle client export
+- [x] Configure `drizzle.config.ts` for Neon PostgreSQL
+- [x] Test Drizzle queries work alongside existing raw SQL
 
 ### 0.2 shadcn/ui Setup
 
-- [ ] Initialize shadcn/ui: `npx shadcn@latest init`
-- [ ] Configure for Tailwind v4
-- [ ] Add Button component
-- [ ] Add Card component
-- [ ] Add Input component
-- [ ] Add Form component
-- [ ] Add Dialog component
-- [ ] Add Sheet component
-- [ ] Add Tabs component
-- [ ] Add Avatar component
-- [ ] Add Badge component
-- [ ] Add Progress component
-- [ ] Add Toast component
-- [ ] Add Alert component
+- [x] Initialize shadcn/ui: `npx shadcn@latest init`
+- [x] Configure for Tailwind v4
+- [x] Add Button component
+- [x] Add Card component
+- [x] Add Input component
+- [x] Add Form component
+- [x] Add Dialog component
+- [x] Add Sheet component
+- [x] Add Tabs component
+- [x] Add Avatar component
+- [x] Add Badge component
+- [x] Add Progress component
+- [x] Add Toast component
+- [x] Add Alert component
 
 ### 0.3 Service Layer Pattern
 
-- [ ] Create `/src/lib/services/` directory
-- [ ] Create `/src/lib/services/user.ts` - Extract from existing API routes
-- [ ] Create `/src/lib/services/matching.ts` - Extract from existing API routes
-- [ ] Create `/src/lib/services/activity.ts` - Extract from existing API routes
-- [ ] Create `/src/lib/services/communication.ts` - Extract from existing API routes
-- [ ] Create `/src/lib/services/intimacy.ts` - Extract from existing API routes
-- [ ] Create `/src/lib/validations/` directory
-- [ ] Create Zod schemas for API requests
-- [ ] Standardize API response format: `{ success, data/error }`
+- [x] Create `/src/lib/services/` directory
+- [x] Create `/src/lib/services/user.ts` - Extract from existing API routes
+- [x] Create `/src/lib/services/matching.ts` - Extract from existing API routes
+- [x] Create `/src/lib/services/activity.ts` - Extract from existing API routes
+- [x] Create `/src/lib/services/communication.ts` - Extract from existing API routes
+- [x] Create `/src/lib/services/intimacy.ts` - Extract from existing API routes
+- [x] Create `/src/lib/validations/` directory
+- [x] Create Zod schemas for API requests
+- [x] Standardize API response format: `{ success, data/error }`
 
 ### 0.4 Feature Flags
 
-- [ ] Create `/src/lib/features.ts`
-- [ ] Add `FEATURE_PLAYCOIN` flag
-- [ ] Add `FEATURE_PARADISE_MODE` flag
-- [ ] Add `FEATURE_B2B` flag
-- [ ] Add environment variable configuration
+- [x] Create `/src/lib/features.ts`
+- [x] Add `FEATURE_PLAYCOIN` flag
+- [x] Add `FEATURE_PARADISE_MODE` flag
+- [x] Add `FEATURE_B2B` flag
+- [x] Add environment variable configuration
 
 ---
 
@@ -576,10 +576,10 @@
 
 ### Phase 0 Complete
 
-- [ ] Drizzle ORM working alongside raw SQL
-- [ ] All shadcn/ui components installed
-- [ ] Service layer pattern established
-- [ ] Feature flags system working
+- [x] Drizzle ORM working alongside raw SQL
+- [x] All shadcn/ui components installed
+- [x] Service layer pattern established
+- [x] Feature flags system working
 
 ### Phase 1 Complete
 
