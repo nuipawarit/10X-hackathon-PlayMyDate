@@ -11,6 +11,12 @@ export async function POST(request: NextRequest) {
 
   try {
     // Drop all tables and recreate (hard reset)
+    // Phase 3 tables
+    await sql`DROP TABLE IF EXISTS analytics_reports CASCADE`;
+    await sql`DROP TABLE IF EXISTS unlock_history CASCADE`;
+    await sql`DROP TABLE IF EXISTS campaign_events CASCADE`;
+    await sql`DROP TABLE IF EXISTS aggregated_insights CASCADE`;
+    await sql`DROP TABLE IF EXISTS user_behavioral_profiles CASCADE`;
     // Phase 2 tables
     await sql`DROP TABLE IF EXISTS quest_completions CASCADE`;
     await sql`DROP TABLE IF EXISTS branded_quests CASCADE`;
@@ -406,6 +412,83 @@ export async function POST(request: NextRequest) {
       FOREIGN KEY (partner_id) REFERENCES merchants(id)
     `;
 
+    // ===== Phase 3 Tables =====
+
+    // Create user_behavioral_profiles table
+    await sql`
+      CREATE TABLE user_behavioral_profiles (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID UNIQUE NOT NULL REFERENCES users(id),
+        persona_type VARCHAR(50),
+        engagement_score DECIMAL(5, 2) DEFAULT 0,
+        activity_patterns JSONB,
+        preferences JSONB,
+        last_analyzed_at TIMESTAMP,
+        created_at TIMESTAMP DEFAULT NOW() NOT NULL,
+        updated_at TIMESTAMP DEFAULT NOW() NOT NULL
+      )
+    `;
+
+    // Create aggregated_insights table
+    await sql`
+      CREATE TABLE aggregated_insights (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        merchant_id UUID NOT NULL REFERENCES merchants(id),
+        period_start TIMESTAMP NOT NULL,
+        period_end TIMESTAMP NOT NULL,
+        insight_type VARCHAR(50) NOT NULL,
+        data JSONB NOT NULL,
+        created_at TIMESTAMP DEFAULT NOW() NOT NULL
+      )
+    `;
+
+    // Create campaign_events table
+    await sql`
+      CREATE TABLE campaign_events (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        campaign_id UUID NOT NULL REFERENCES campaigns(id),
+        user_id UUID REFERENCES users(id),
+        event_type VARCHAR(50) NOT NULL,
+        event_data JSONB,
+        created_at TIMESTAMP DEFAULT NOW() NOT NULL
+      )
+    `;
+
+    // Create unlock_history table
+    await sql`
+      CREATE TABLE unlock_history (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID NOT NULL REFERENCES users(id),
+        match_id UUID NOT NULL REFERENCES matches(id),
+        unlock_type VARCHAR(50) NOT NULL,
+        milestone INTEGER,
+        unlocked_at TIMESTAMP DEFAULT NOW() NOT NULL
+      )
+    `;
+
+    // Create analytics_reports table
+    await sql`
+      CREATE TABLE analytics_reports (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        merchant_id UUID NOT NULL REFERENCES merchants(id),
+        report_type VARCHAR(50) NOT NULL,
+        config JSONB,
+        data JSONB,
+        status VARCHAR(20) DEFAULT 'pending',
+        generated_at TIMESTAMP,
+        created_at TIMESTAMP DEFAULT NOW() NOT NULL
+      )
+    `;
+
+    // Create indexes for Phase 3 tables
+    await sql`CREATE INDEX idx_behavioral_profiles_user_id ON user_behavioral_profiles(user_id)`;
+    await sql`CREATE INDEX idx_aggregated_insights_merchant_id ON aggregated_insights(merchant_id)`;
+    await sql`CREATE INDEX idx_campaign_events_campaign_id ON campaign_events(campaign_id)`;
+    await sql`CREATE INDEX idx_campaign_events_user_id ON campaign_events(user_id)`;
+    await sql`CREATE INDEX idx_unlock_history_user_id ON unlock_history(user_id)`;
+    await sql`CREATE INDEX idx_unlock_history_match_id ON unlock_history(match_id)`;
+    await sql`CREATE INDEX idx_analytics_reports_merchant_id ON analytics_reports(merchant_id)`;
+
     const passwordHash = await hashPassword('password123');
 
     // Demo users matching original initial state
@@ -593,7 +676,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Demo data seeded successfully with Phase 2 tables',
+      message: 'Demo data seeded successfully with Phase 3 tables',
     });
   } catch (error) {
     console.error('Seed error:', error);
