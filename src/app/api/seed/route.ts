@@ -11,6 +11,17 @@ export async function POST(request: NextRequest) {
 
   try {
     // Drop all tables and recreate (hard reset)
+    // Phase 2 tables
+    await sql`DROP TABLE IF EXISTS quest_completions CASCADE`;
+    await sql`DROP TABLE IF EXISTS branded_quests CASCADE`;
+    await sql`DROP TABLE IF EXISTS campaigns CASCADE`;
+    await sql`DROP TABLE IF EXISTS qr_checkins CASCADE`;
+    await sql`DROP TABLE IF EXISTS date_bookings CASCADE`;
+    await sql`DROP TABLE IF EXISTS date_venues CASCADE`;
+    await sql`DROP TABLE IF EXISTS merchant_sessions CASCADE`;
+    await sql`DROP TABLE IF EXISTS merchant_users CASCADE`;
+    await sql`DROP TABLE IF EXISTS merchants CASCADE`;
+    // Phase 1 tables
     await sql`DROP TABLE IF EXISTS user_rewards CASCADE`;
     await sql`DROP TABLE IF EXISTS rewards CASCADE`;
     await sql`DROP TABLE IF EXISTS daily_checkins CASCADE`;
@@ -224,6 +235,177 @@ export async function POST(request: NextRequest) {
       )
     `;
 
+    // ===== Phase 2 Tables =====
+
+    // Create merchants table
+    await sql`
+      CREATE TABLE merchants (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        name VARCHAR(255) NOT NULL,
+        business_type VARCHAR(50) NOT NULL,
+        description TEXT,
+        contact_email VARCHAR(255) NOT NULL,
+        contact_phone VARCHAR(50),
+        address TEXT,
+        logo_url TEXT,
+        status VARCHAR(20) DEFAULT 'pending',
+        tier VARCHAR(20) DEFAULT 'basic',
+        api_key VARCHAR(255) UNIQUE,
+        metadata JSONB,
+        created_at TIMESTAMP DEFAULT NOW() NOT NULL,
+        updated_at TIMESTAMP DEFAULT NOW() NOT NULL
+      )
+    `;
+
+    // Create merchant_users table
+    await sql`
+      CREATE TABLE merchant_users (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        merchant_id UUID NOT NULL REFERENCES merchants(id),
+        email VARCHAR(255) UNIQUE NOT NULL,
+        password_hash TEXT NOT NULL,
+        display_name VARCHAR(100),
+        role VARCHAR(20) DEFAULT 'staff',
+        permissions JSONB,
+        is_active BOOLEAN DEFAULT true,
+        created_at TIMESTAMP DEFAULT NOW() NOT NULL,
+        updated_at TIMESTAMP DEFAULT NOW() NOT NULL
+      )
+    `;
+
+    // Create merchant_sessions table
+    await sql`
+      CREATE TABLE merchant_sessions (
+        id TEXT PRIMARY KEY,
+        user_id UUID NOT NULL REFERENCES merchant_users(id),
+        expires_at TIMESTAMPTZ NOT NULL
+      )
+    `;
+
+    // Create date_venues table
+    await sql`
+      CREATE TABLE date_venues (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        merchant_id UUID REFERENCES merchants(id),
+        name VARCHAR(255) NOT NULL,
+        venue_type VARCHAR(50) NOT NULL,
+        description TEXT,
+        address TEXT,
+        location_lat DECIMAL(10, 7),
+        location_lng DECIMAL(10, 7),
+        price_range INTEGER,
+        cuisine_type VARCHAR(50),
+        ambiance_tags JSONB,
+        opening_hours JSONB,
+        booking_enabled BOOLEAN DEFAULT true,
+        photos JSONB,
+        rating DECIMAL(2, 1),
+        is_active BOOLEAN DEFAULT true,
+        created_at TIMESTAMP DEFAULT NOW() NOT NULL
+      )
+    `;
+
+    // Create date_bookings table
+    await sql`
+      CREATE TABLE date_bookings (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        match_id UUID NOT NULL REFERENCES matches(id),
+        venue_id UUID NOT NULL REFERENCES date_venues(id),
+        initiated_by_user_id UUID NOT NULL REFERENCES users(id),
+        booking_date DATE NOT NULL,
+        booking_time TIME NOT NULL,
+        party_size INTEGER DEFAULT 2,
+        special_requests TEXT,
+        confirmation_code VARCHAR(50) UNIQUE,
+        status VARCHAR(20) DEFAULT 'pending',
+        voucher_applied_id UUID,
+        split_bill_preference VARCHAR(20),
+        created_at TIMESTAMP DEFAULT NOW() NOT NULL,
+        updated_at TIMESTAMP DEFAULT NOW() NOT NULL
+      )
+    `;
+
+    // Create qr_checkins table
+    await sql`
+      CREATE TABLE qr_checkins (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID NOT NULL REFERENCES users(id),
+        venue_id UUID NOT NULL REFERENCES date_venues(id),
+        booking_id UUID REFERENCES date_bookings(id),
+        qr_code VARCHAR(255) NOT NULL,
+        coins_earned INTEGER DEFAULT 0,
+        checked_in_at TIMESTAMP DEFAULT NOW() NOT NULL,
+        UNIQUE(user_id, venue_id, booking_id)
+      )
+    `;
+
+    // Create campaigns table
+    await sql`
+      CREATE TABLE campaigns (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        merchant_id UUID NOT NULL REFERENCES merchants(id),
+        name VARCHAR(255) NOT NULL,
+        type VARCHAR(50) NOT NULL,
+        description TEXT,
+        budget DECIMAL(10, 2),
+        spent DECIMAL(10, 2) DEFAULT 0,
+        cpa_rate DECIMAL(10, 2),
+        cpmi_rate DECIMAL(10, 2),
+        target_audience JSONB,
+        start_date TIMESTAMP,
+        end_date TIMESTAMP,
+        status VARCHAR(20) DEFAULT 'draft',
+        metrics JSONB,
+        created_at TIMESTAMP DEFAULT NOW() NOT NULL,
+        updated_at TIMESTAMP DEFAULT NOW() NOT NULL
+      )
+    `;
+
+    // Create branded_quests table
+    await sql`
+      CREATE TABLE branded_quests (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        campaign_id UUID NOT NULL REFERENCES campaigns(id),
+        activity_id UUID NOT NULL REFERENCES activities(id),
+        name VARCHAR(255) NOT NULL,
+        description TEXT,
+        instructions TEXT,
+        coin_reward INTEGER DEFAULT 0,
+        voucher_reward_id UUID,
+        max_completions INTEGER,
+        completion_count INTEGER DEFAULT 0,
+        is_active BOOLEAN DEFAULT true,
+        created_at TIMESTAMP DEFAULT NOW() NOT NULL
+      )
+    `;
+
+    // Create quest_completions table
+    await sql`
+      CREATE TABLE quest_completions (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        branded_quest_id UUID NOT NULL REFERENCES branded_quests(id),
+        user_id UUID NOT NULL REFERENCES users(id),
+        match_id UUID NOT NULL REFERENCES matches(id),
+        completed_at TIMESTAMP DEFAULT NOW() NOT NULL,
+        reward_granted BOOLEAN DEFAULT false,
+        UNIQUE(branded_quest_id, user_id)
+      )
+    `;
+
+    // Add FK to activities.sponsor_merchant_id
+    await sql`
+      ALTER TABLE activities
+      ADD CONSTRAINT activities_sponsor_merchant_id_fkey
+      FOREIGN KEY (sponsor_merchant_id) REFERENCES merchants(id)
+    `;
+
+    // Add FK to rewards.partner_id
+    await sql`
+      ALTER TABLE rewards
+      ADD CONSTRAINT rewards_partner_id_fkey
+      FOREIGN KEY (partner_id) REFERENCES merchants(id)
+    `;
+
     const passwordHash = await hashPassword('password123');
 
     // Demo users matching original initial state
@@ -368,9 +550,50 @@ export async function POST(request: NextRequest) {
         ('Movie Ticket', 'Free movie ticket at Major Cineplex', 'voucher', 500, 50, true)
     `;
 
+    // ===== Phase 2 Seed Data =====
+
+    // Seed demo merchants
+    const merchant1Id = crypto.randomUUID();
+    const merchant2Id = crypto.randomUUID();
+
+    await sql`
+      INSERT INTO merchants (id, name, business_type, description, contact_email, contact_phone, address, status, tier, api_key)
+      VALUES
+        (${merchant1Id}, 'Cafe Romantique', 'restaurant', 'Cozy cafe perfect for first dates', 'contact@caferomantique.com', '021234567', '123 Sukhumvit Rd, Bangkok', 'active', 'premium', ${'api_' + crypto.randomUUID().replace(/-/g, '')}),
+        (${merchant2Id}, 'Adventure Park BKK', 'entertainment', 'Exciting activities for couples', 'info@adventureparkbkk.com', '029876543', '456 Ratchada Rd, Bangkok', 'active', 'basic', ${'api_' + crypto.randomUUID().replace(/-/g, '')})
+    `;
+
+    // Seed merchant users
+    const merchantUserHash = await hashPassword('merchant123');
+    await sql`
+      INSERT INTO merchant_users (merchant_id, email, password_hash, display_name, role)
+      VALUES
+        (${merchant1Id}, 'admin@caferomantique.com', ${merchantUserHash}, 'Cafe Admin', 'admin'),
+        (${merchant2Id}, 'admin@adventureparkbkk.com', ${merchantUserHash}, 'Park Admin', 'admin')
+    `;
+
+    // Seed date venues
+    await sql`
+      INSERT INTO date_venues (merchant_id, name, venue_type, description, address, location_lat, location_lng, price_range, cuisine_type, ambiance_tags, booking_enabled, rating, is_active)
+      VALUES
+        (${merchant1Id}, 'Cafe Romantique - Thonglor', 'cafe', 'Intimate cafe with amazing coffee and desserts', '123 Thonglor Soi 10, Bangkok', 13.7326, 100.5847, 2, 'cafe', '["romantic", "quiet", "cozy"]', true, 4.5, true),
+        (${merchant1Id}, 'Cafe Romantique - Ari', 'cafe', 'Garden cafe with relaxing atmosphere', '45 Ari Soi 4, Bangkok', 13.7902, 100.5448, 2, 'cafe', '["garden", "relaxing", "instagram"]', true, 4.3, true),
+        (${merchant2Id}, 'Adventure Park - Escape Room', 'entertainment', 'Exciting escape room challenges for couples', '456 Ratchada Rd, Bangkok', 13.7645, 100.5742, 3, NULL, '["exciting", "teamwork", "fun"]', true, 4.7, true),
+        (${merchant2Id}, 'Adventure Park - Mini Golf', 'entertainment', 'Fun mini golf course with drinks', '456 Ratchada Rd, Bangkok', 13.7645, 100.5742, 2, NULL, '["fun", "casual", "outdoor"]', true, 4.2, true),
+        (NULL, 'Sky Bar Bangkok', 'bar', 'Rooftop bar with stunning city views', '789 Silom Rd, Bangkok', 13.7220, 100.5260, 4, 'bar', '["rooftop", "romantic", "views"]', false, 4.8, true),
+        (NULL, 'Dinner in the Sky', 'restaurant', 'Unique dining experience 50m in the air', '999 Asok Rd, Bangkok', 13.7380, 100.5607, 5, 'fine_dining', '["unique", "memorable", "luxury"]', true, 4.9, true)
+    `;
+
+    // Seed a demo campaign
+    await sql`
+      INSERT INTO campaigns (merchant_id, name, type, description, budget, status, start_date, end_date)
+      VALUES
+        (${merchant1Id}, 'Valentine Special 2026', 'seasonal', 'Special offers for couples during Valentine season', 50000.00, 'active', '2026-02-01', '2026-02-28')
+    `;
+
     return NextResponse.json({
       success: true,
-      message: 'Demo data seeded successfully with PlayCoin tables',
+      message: 'Demo data seeded successfully with Phase 2 tables',
     });
   } catch (error) {
     console.error('Seed error:', error);

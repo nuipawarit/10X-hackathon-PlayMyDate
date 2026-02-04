@@ -251,7 +251,7 @@
 
 ### 2.1 Date Planning Domain - Tables
 
-- [ ] Create `date_venues` table
+- [x] Create `date_venues` table
   - `id` UUID PK
   - `merchant_id` UUID (FK added later)
   - `name` VARCHAR(255)
@@ -268,7 +268,7 @@
   - `rating` DECIMAL
   - `is_active` BOOLEAN
   - `created_at` TIMESTAMP
-- [ ] Create `date_bookings` table
+- [x] Create `date_bookings` table
   - `id` UUID PK
   - `match_id` UUID FK
   - `venue_id` UUID FK
@@ -282,7 +282,7 @@
   - `voucher_applied_id` UUID FK
   - `split_bill_preference` VARCHAR(20)
   - `created_at`, `updated_at` TIMESTAMP
-- [ ] Create `qr_checkins` table
+- [x] Create `qr_checkins` table
   - `id` UUID PK
   - `user_id` UUID FK
   - `venue_id` UUID FK
@@ -290,38 +290,38 @@
   - `qr_code` VARCHAR(255)
   - `coins_earned` INTEGER
   - `checked_in_at` TIMESTAMP
-- [ ] Create Drizzle schema: `/src/lib/db/schema/dates.ts`
-- [ ] Create indexes
+- [x] Create Drizzle schema: `/src/lib/db/schema/dates.ts`
+- [x] Create indexes
 
 ### 2.2 Date Planning Services
 
-- [ ] Create `/src/lib/services/venue.ts`
-  - [ ] `searchVenues(filters, pagination)` - Search with filters
-  - [ ] `getVenueById(venueId)` - Get venue details
-  - [ ] `getRecommendationsForMatch(matchId)` - AI recommendations
-- [ ] Create `/src/lib/services/booking.ts`
-  - [ ] `createBooking(data)` - Create new booking
-  - [ ] `getBookingById(bookingId)` - Get booking details
-  - [ ] `getUserBookings(userId)` - List user bookings
-  - [ ] `updateBookingStatus(bookingId, status)` - Update status
-  - [ ] `cancelBooking(bookingId, userId)` - Cancel booking
-  - [ ] `performQRCheckin(userId, qrCode)` - QR check-in
+- [x] Create `/src/lib/services/venue.ts`
+  - [x] `searchVenues(filters, pagination)` - Search with filters
+  - [x] `getVenueById(venueId)` - Get venue details
+  - [x] `getRecommendationsForMatch(matchId)` - AI recommendations
+- [x] Create `/src/lib/services/booking.ts`
+  - [x] `createBooking(data)` - Create new booking
+  - [x] `getBookingById(bookingId)` - Get booking details
+  - [x] `getUserBookings(userId)` - List user bookings
+  - [x] `updateBookingStatus(bookingId, status)` - Update status
+  - [x] `cancelBooking(bookingId, userId)` - Cancel booking
+  - [x] `performQRCheckin(userId, qrCode)` - QR check-in
 
 ### 2.3 Date Planning API Routes
 
-- [ ] Create `GET /api/dates/venues/route.ts` - Search venues
-- [ ] Create `GET /api/dates/venues/[id]/route.ts` - Venue details
-- [ ] Create `GET /api/dates/recommendations/route.ts` - Recommendations
-- [ ] Create `GET /api/dates/bookings/route.ts` - List bookings
-- [ ] Create `POST /api/dates/bookings/route.ts` - Create booking
-- [ ] Create `GET /api/dates/bookings/[id]/route.ts` - Booking details
-- [ ] Create `PUT /api/dates/bookings/[id]/route.ts` - Update booking
-- [ ] Create `DELETE /api/dates/bookings/[id]/route.ts` - Cancel booking
-- [ ] Create `POST /api/dates/checkin/route.ts` - QR check-in
+- [x] Create `GET /api/dates/venues/route.ts` - Search venues
+- [x] Create `GET /api/dates/venues/[id]/route.ts` - Venue details
+- [x] Create `GET /api/dates/recommendations/route.ts` - Recommendations
+- [x] Create `GET /api/dates/bookings/route.ts` - List bookings
+- [x] Create `POST /api/dates/bookings/route.ts` - Create booking
+- [x] Create `GET /api/dates/bookings/[id]/route.ts` - Booking details
+- [x] Create `PUT /api/dates/bookings/[id]/route.ts` - Update booking
+- [x] Create `DELETE /api/dates/bookings/[id]/route.ts` - Cancel booking
+- [x] Create `POST /api/dates/checkin/route.ts` - QR check-in
 
 ### 2.4 B2B Domain - Tables
 
-- [ ] Create `merchants` table
+- [x] Create `merchants` table
   - `id` UUID PK
   - `name` VARCHAR(255)
   - `business_type` VARCHAR(50)
@@ -335,7 +335,7 @@
   - `api_key` VARCHAR(255) UNIQUE
   - `metadata` JSONB
   - `created_at`, `updated_at` TIMESTAMP
-- [ ] Create `merchant_users` table
+- [x] Create `merchant_users` table
   - `id` UUID PK
   - `merchant_id` UUID FK
   - `email` VARCHAR(255) UNIQUE
@@ -345,14 +345,14 @@
   - `permissions` JSONB
   - `is_active` BOOLEAN
   - `created_at`, `updated_at` TIMESTAMP
-- [ ] Add FK to `date_venues.merchant_id`
-- [ ] Add FK to `activities.sponsor_merchant_id`
-- [ ] Add FK to `rewards.partner_id`
-- [ ] Create Drizzle schema: `/src/lib/db/schema/b2b.ts`
+- [x] Add FK to `date_venues.merchant_id`
+- [x] Add FK to `activities.sponsor_merchant_id`
+- [x] Add FK to `rewards.partner_id`
+- [x] Create Drizzle schema: `/src/lib/db/schema/b2b.ts`
 
 ### 2.5 B2B Campaigns & Quests - Tables
 
-- [ ] Create `campaigns` table
+- [x] Create `campaigns` table
   - `id` UUID PK
   - `merchant_id` UUID FK
   - `name` VARCHAR(255)
@@ -366,7 +366,7 @@
   - `status` VARCHAR(20) DEFAULT 'draft'
   - `metrics` JSONB
   - `created_at`, `updated_at` TIMESTAMP
-- [ ] Create `branded_quests` table
+- [x] Create `branded_quests` table
   - `id` UUID PK
   - `campaign_id` UUID FK
   - `activity_id` UUID FK
@@ -378,7 +378,7 @@
   - `completion_count` INTEGER DEFAULT 0
   - `is_active` BOOLEAN
   - `created_at` TIMESTAMP
-- [ ] Create `quest_completions` table
+- [x] Create `quest_completions` table
   - `id` UUID PK
   - `branded_quest_id` UUID FK
   - `user_id` UUID FK
@@ -389,82 +389,82 @@
 
 ### 2.6 B2B Services
 
-- [ ] Create `/src/lib/auth-b2b.ts` - B2B authentication
-  - [ ] Separate session management
-  - [ ] API key validation middleware
+- [x] Create `/src/lib/auth-b2b.ts` - B2B authentication
+  - [x] Separate session management
+  - [x] API key validation middleware
   - [ ] Role-based permissions
-- [ ] Create `/src/lib/services/merchant.ts`
-  - [ ] `createMerchant(data)` - Create merchant
-  - [ ] `getMerchantById(merchantId)` - Get merchant
-  - [ ] `updateMerchant(merchantId, data)` - Update merchant
-  - [ ] `createMerchantUser(merchantId, data)` - Add user
-  - [ ] `generateAPIKey(merchantId)` - Generate API key
-- [ ] Create `/src/lib/services/campaign.ts`
-  - [ ] `createCampaign(merchantId, data)` - Create campaign
-  - [ ] `getCampaigns(merchantId, filters)` - List campaigns
-  - [ ] `updateCampaignStatus(campaignId, status)` - Update status
-- [ ] Create `/src/lib/services/quest.ts`
-  - [ ] `createBrandedQuest(campaignId, data)` - Create quest
-  - [ ] `trackQuestCompletion(questId, userId, matchId)` - Track completion
+- [x] Create `/src/lib/services/merchant.ts`
+  - [x] `createMerchant(data)` - Create merchant
+  - [x] `getMerchantById(merchantId)` - Get merchant
+  - [x] `updateMerchant(merchantId, data)` - Update merchant
+  - [x] `createMerchantUser(merchantId, data)` - Add user
+  - [x] `generateAPIKey(merchantId)` - Generate API key
+- [x] Create `/src/lib/services/campaign.ts`
+  - [x] `createCampaign(merchantId, data)` - Create campaign
+  - [x] `getCampaigns(merchantId, filters)` - List campaigns
+  - [x] `updateCampaignStatus(campaignId, status)` - Update status
+- [x] Create `/src/lib/services/quest.ts`
+  - [x] `createBrandedQuest(campaignId, data)` - Create quest
+  - [x] `trackQuestCompletion(questId, userId, matchId)` - Track completion
 
 ### 2.7 B2B API Routes (MVP)
 
-- [ ] Create `POST /api/b2b/auth/login/route.ts` - Merchant login
-- [ ] Create `POST /api/b2b/auth/logout/route.ts` - Merchant logout
-- [ ] Create `GET /api/b2b/auth/session/route.ts` - Check session
-- [ ] Create `GET /api/b2b/merchant/route.ts` - Get merchant profile
-- [ ] Create `PUT /api/b2b/merchant/route.ts` - Update merchant
-- [ ] Create `GET /api/b2b/campaigns/route.ts` - List campaigns
-- [ ] Create `POST /api/b2b/campaigns/route.ts` - Create campaign
-- [ ] Create `GET /api/b2b/campaigns/[id]/route.ts` - Campaign details
-- [ ] Create `PUT /api/b2b/campaigns/[id]/route.ts` - Update campaign
-- [ ] Create `GET /api/b2b/quests/route.ts` - List quests
-- [ ] Create `POST /api/b2b/quests/route.ts` - Create quest
-- [ ] Create `GET /api/b2b/venues/route.ts` - List merchant venues
-- [ ] Create `POST /api/b2b/venues/route.ts` - Add venue
+- [x] Create `POST /api/b2b/auth/login/route.ts` - Merchant login
+- [x] Create `POST /api/b2b/auth/logout/route.ts` - Merchant logout
+- [x] Create `GET /api/b2b/auth/session/route.ts` - Check session
+- [x] Create `GET /api/b2b/merchant/route.ts` - Get merchant profile
+- [x] Create `PUT /api/b2b/merchant/route.ts` - Update merchant
+- [x] Create `GET /api/b2b/campaigns/route.ts` - List campaigns
+- [x] Create `POST /api/b2b/campaigns/route.ts` - Create campaign
+- [x] Create `GET /api/b2b/campaigns/[id]/route.ts` - Campaign details
+- [x] Create `PUT /api/b2b/campaigns/[id]/route.ts` - Update campaign
+- [x] Create `GET /api/b2b/quests/route.ts` - List quests
+- [x] Create `POST /api/b2b/quests/route.ts` - Create quest
+- [x] Create `GET /api/b2b/venues/route.ts` - List merchant venues
+- [x] Create `POST /api/b2b/venues/route.ts` - Add venue
 
 ### 2.8 Voice Notes
 
-- [ ] Configure Vercel Blob for audio storage
-- [ ] Create upload/download utilities
-- [ ] Create `POST /api/users/voice-note/route.ts` - Upload
-- [ ] Create `DELETE /api/users/voice-note/route.ts` - Remove
-- [ ] Create `/src/components/profile/VoiceRecorder.tsx`
+- [x] Configure Vercel Blob for audio storage
+- [x] Create upload/download utilities
+- [x] Create `POST /api/users/voice-note/route.ts` - Upload
+- [x] Create `DELETE /api/users/voice-note/route.ts` - Remove
+- [x] Create `/src/components/profile/VoiceRecorder.tsx`
 - [ ] Add voice recorder to profile page
 
 ### 2.9 Frontend Updates - Phase 2
 
 #### Paradise Mode Components
 
-- [ ] Create `/src/components/paradise/VenueSearch.tsx`
-- [ ] Create `/src/components/paradise/VenueCard.tsx`
-- [ ] Create `/src/components/paradise/VenueDetail.tsx`
-- [ ] Create `/src/components/paradise/BookingForm.tsx`
-- [ ] Create `/src/components/paradise/BookingConfirmation.tsx`
-- [ ] Create `/src/components/paradise/QRScanner.tsx`
-- [ ] Create `/src/components/paradise/index.ts`
+- [x] Create `/src/components/paradise/VenueSearch.tsx`
+- [x] Create `/src/components/paradise/VenueCard.tsx`
+- [x] Create `/src/components/paradise/VenueDetail.tsx`
+- [x] Create `/src/components/paradise/BookingForm.tsx`
+- [x] Create `/src/components/paradise/BookingConfirmation.tsx`
+- [x] Create `/src/components/paradise/QRScanner.tsx`
+- [x] Create `/src/components/paradise/index.ts`
 
 #### B2C Pages
 
-- [ ] Create `/src/app/(authenticated)/dates/page.tsx` - Paradise Mode
-- [ ] Create `/src/app/(authenticated)/dates/venues/[id]/page.tsx`
-- [ ] Create `/src/app/(authenticated)/dates/bookings/page.tsx`
+- [x] Create `/src/app/(authenticated)/dates/page.tsx` - Paradise Mode
+- [x] Create `/src/app/(authenticated)/dates/venues/[id]/page.tsx`
+- [x] Create `/src/app/(authenticated)/dates/bookings/page.tsx`
 
 #### B2B Components
 
-- [ ] Create `/src/components/b2b/DashboardOverview.tsx`
-- [ ] Create `/src/components/b2b/MetricCard.tsx`
-- [ ] Create `/src/components/b2b/CampaignList.tsx`
-- [ ] Create `/src/components/b2b/CampaignCard.tsx`
-- [ ] Create `/src/components/b2b/index.ts`
+- [x] Create `/src/components/b2b/DashboardOverview.tsx`
+- [x] Create `/src/components/b2b/MetricCard.tsx`
+- [x] Create `/src/components/b2b/CampaignList.tsx`
+- [x] Create `/src/components/b2b/CampaignCard.tsx`
+- [x] Create `/src/components/b2b/index.ts`
 
 #### B2B Pages
 
-- [ ] Create `/src/app/(b2b)/layout.tsx` - B2B layout
-- [ ] Create `/src/app/(b2b)/login/page.tsx` - Merchant login
-- [ ] Create `/src/app/(b2b)/dashboard/page.tsx` - Dashboard
-- [ ] Create `/src/app/(b2b)/campaigns/page.tsx` - Campaigns list
-- [ ] Create `/src/app/(b2b)/venues/page.tsx` - Venues management
+- [x] Create `/src/app/(b2b)/layout.tsx` - B2B layout
+- [x] Create `/src/app/(b2b)/login/page.tsx` - Merchant login
+- [x] Create `/src/app/(b2b)/dashboard/page.tsx` - Dashboard
+- [x] Create `/src/app/(b2b)/campaigns/page.tsx` - Campaigns list
+- [x] Create `/src/app/(b2b)/venues/page.tsx` - Venues management
 
 ---
 

@@ -8,3 +8,8 @@ export * from './playcoin';
 export * from './checkin';
 export * from './reward';
 export * from './chemistry';
+export * from './venue';
+export * from './booking';
+export * from './merchant';
+export * from './campaign';
+export * from './quest';
