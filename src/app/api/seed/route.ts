@@ -495,6 +495,11 @@ export async function POST(request: NextRequest) {
     const aliceId = crypto.randomUUID();
     const bobId = crypto.randomUUID();
     const charlieId = crypto.randomUUID();
+    const dianaId = crypto.randomUUID();
+    const emmaId = crypto.randomUUID();
+    const frankId = crypto.randomUUID();
+    const graceId = crypto.randomUUID();
+    const henryId = crypto.randomUUID();
 
     const demoUsers = [
       {
@@ -526,6 +531,56 @@ export async function POST(request: NextRequest) {
         bio: 'Artist who loves nature and good conversations.',
         real_name: 'Charlie Brown',
         occupation: 'Graphic Designer',
+      },
+      {
+        id: dianaId,
+        email: 'diana@demo.com',
+        display_name: 'Diana',
+        playing_style: ['casual', 'social'],
+        interests: ['music', 'movies', 'food'],
+        bio: 'Foodie who loves discovering new restaurants and live music.',
+        real_name: 'Diana Lee',
+        occupation: 'Marketing Manager',
+      },
+      {
+        id: emmaId,
+        email: 'emma@demo.com',
+        display_name: 'Emma',
+        playing_style: ['competitive', 'creative'],
+        interests: ['gaming', 'art', 'tech'],
+        bio: 'Digital artist and competitive gamer looking for fellow enthusiasts.',
+        real_name: 'Emma Chen',
+        occupation: 'Game Designer',
+      },
+      {
+        id: frankId,
+        email: 'frank@demo.com',
+        display_name: 'Frank',
+        playing_style: ['strategic', 'social'],
+        interests: ['travel', 'hiking', 'photography'],
+        bio: 'Travel photographer who loves outdoor adventures.',
+        real_name: 'Frank Wilson',
+        occupation: 'Photographer',
+      },
+      {
+        id: graceId,
+        email: 'grace@demo.com',
+        display_name: 'Grace',
+        playing_style: ['casual', 'creative'],
+        interests: ['cooking', 'music', 'art'],
+        bio: 'Home chef and music lover seeking creative connections.',
+        real_name: 'Grace Kim',
+        occupation: 'Pastry Chef',
+      },
+      {
+        id: henryId,
+        email: 'henry@demo.com',
+        display_name: 'Henry',
+        playing_style: ['competitive', 'social'],
+        interests: ['gaming', 'movies', 'travel'],
+        bio: 'Gamer and movie buff who enjoys exploring new places.',
+        real_name: 'Henry Park',
+        occupation: 'Product Manager',
       },
     ];
 
