@@ -95,16 +95,16 @@ export default function B2BCampaignsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between animate-slide-up">
         <div>
-          <h1 className="text-2xl font-bold">Campaigns</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-3xl font-extrabold gradient-text">Campaigns</h1>
+          <p className="text-gray-500 mt-1">
             Manage your marketing campaigns
           </p>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button>Create Campaign</Button>
+            <button className="btn-primary">Create Campaign</button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
@@ -177,16 +177,16 @@ export default function B2BCampaignsPage() {
               </div>
 
               <div className="flex gap-2 pt-4">
-                <Button type="submit" disabled={isSubmitting || !name || !type}>
+                <button type="submit" disabled={isSubmitting || !name || !type} className="btn-primary disabled:opacity-50">
                   {isSubmitting ? 'Creating...' : 'Create Campaign'}
-                </Button>
-                <Button
+                </button>
+                <button
                   type="button"
-                  variant="outline"
+                  className="btn-secondary"
                   onClick={() => setIsDialogOpen(false)}
                 >
                   Cancel
-                </Button>
+                </button>
               </div>
             </form>
           </DialogContent>
@@ -194,11 +194,15 @@ export default function B2BCampaignsPage() {
       </div>
 
       {loading ? (
-        <div className="text-center py-12">
-          <p className="text-muted-foreground">Loading campaigns...</p>
+        <div className="space-y-4">
+          <div className="skeleton h-32 rounded-2xl" />
+          <div className="skeleton h-32 rounded-2xl" />
+          <div className="skeleton h-32 rounded-2xl" />
         </div>
       ) : (
-        <CampaignList campaigns={campaigns} />
+        <div className="animate-slide-up" style={{ animationDelay: '0.1s' }}>
+          <CampaignList campaigns={campaigns} />
+        </div>
       )}
     </div>
   );

@@ -3,9 +3,6 @@
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { DateVenue } from '@/lib/services/venue';
 
 export default function VenueDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -65,108 +62,113 @@ export default function VenueDetailPage({ params }: { params: Promise<{ id: stri
 
   if (loading) {
     return (
-      <div className="space-y-6 animate-pulse">
-        <div className="h-8 bg-muted rounded w-48" />
-        <div className="h-64 bg-muted rounded" />
+      <div className="space-y-6">
+        <div className="skeleton h-9 w-48" />
+        <div className="skeleton h-5 w-32" />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="skeleton h-48 rounded-2xl" />
+          <div className="skeleton h-48 rounded-2xl" />
+        </div>
       </div>
     );
   }
 
   if (!venue) {
     return (
-      <div className="text-center py-12">
-        <p className="text-muted-foreground">Venue not found</p>
-        <Button onClick={() => router.back()} className="mt-4">Go Back</Button>
+      <div className="card text-center py-16 animate-bounce-in">
+        <div className="w-16 h-16 mx-auto mb-4 rounded-3xl bg-gradient-to-br from-purple-100 to-orange-100 flex items-center justify-center animate-float">
+          <svg className="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+          </svg>
+        </div>
+        <h3 className="text-lg font-bold text-gray-800 mb-2">Venue not found</h3>
+        <button onClick={() => router.back()} className="btn-secondary mt-4">Go Back</button>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between animate-slide-up">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold">{venue.name}</h1>
-            <Badge variant={venue.is_active ? 'default' : 'secondary'}>
+            <h1 className="text-3xl font-extrabold gradient-text">{venue.name}</h1>
+            <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${venue.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
               {venue.is_active ? 'Active' : 'Inactive'}
-            </Badge>
+            </span>
           </div>
           <div className="flex gap-2 mt-2">
-            <Badge variant="outline">{venue.venue_type}</Badge>
-            {venue.cuisine_type && <Badge variant="outline">{venue.cuisine_type}</Badge>}
+            <span className="text-xs bg-primary-50 text-primary-600 px-2.5 py-1 rounded-full">{venue.venue_type}</span>
+            {venue.cuisine_type && <span className="text-xs bg-secondary-50 text-secondary-600 px-2.5 py-1 rounded-full">{venue.cuisine_type}</span>}
             {venue.price_range && (
-              <Badge variant="outline">{'฿'.repeat(venue.price_range)}</Badge>
+              <span className="text-xs bg-amber-50 text-amber-600 px-2.5 py-1 rounded-full">{'฿'.repeat(venue.price_range)}</span>
             )}
           </div>
         </div>
         <div className="flex gap-2">
           <Link href={`/b2b/venues/${id}/edit`}>
-            <Button variant="outline">Edit</Button>
+            <button className="btn-secondary">Edit</button>
           </Link>
-          <Button variant="outline" onClick={handleToggleActive}>
+          <button className="btn-secondary" onClick={handleToggleActive}>
             {venue.is_active ? 'Deactivate' : 'Activate'}
-          </Button>
-          <Button variant="destructive" onClick={handleDelete} disabled={deleting}>
+          </button>
+          <button className="px-4 py-2 bg-red-500 text-white rounded-xl font-medium hover:bg-red-600 transition-colors disabled:opacity-50" onClick={handleDelete} disabled={deleting}>
             {deleting ? 'Deleting...' : 'Delete'}
-          </Button>
-          <Button variant="ghost" onClick={() => router.back()}>
+          </button>
+          <button className="btn-secondary" onClick={() => router.back()}>
             Back
-          </Button>
+          </button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Details</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <div className="card animate-slide-up" style={{ animationDelay: '0.1s' }}>
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">Details</h2>
+          <div className="space-y-4">
             {venue.description && (
               <div>
-                <p className="text-sm text-muted-foreground">Description</p>
-                <p>{venue.description}</p>
+                <p className="text-sm text-gray-500">Description</p>
+                <p className="text-gray-800">{venue.description}</p>
               </div>
             )}
             {venue.address && (
               <div>
-                <p className="text-sm text-muted-foreground">Address</p>
-                <p>📍 {venue.address}</p>
+                <p className="text-sm text-gray-500">Address</p>
+                <p className="text-gray-800">📍 {venue.address}</p>
               </div>
             )}
             {venue.rating && (
               <div>
-                <p className="text-sm text-muted-foreground">Rating</p>
-                <p>⭐ {venue.rating}</p>
+                <p className="text-sm text-gray-500">Rating</p>
+                <p className="text-amber-600 font-medium">⭐ {venue.rating}</p>
               </div>
             )}
             <div>
-              <p className="text-sm text-muted-foreground">Booking</p>
-              <p>{venue.booking_enabled ? '✅ Enabled' : '❌ Disabled'}</p>
+              <p className="text-sm text-gray-500">Booking</p>
+              <p className="text-gray-800">{venue.booking_enabled ? '✅ Enabled' : '❌ Disabled'}</p>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Settings</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <div className="card animate-slide-up" style={{ animationDelay: '0.15s' }}>
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">Settings</h2>
+          <div className="space-y-4">
             {venue.ambiance_tags && venue.ambiance_tags.length > 0 && (
               <div>
-                <p className="text-sm text-muted-foreground mb-2">Ambiance Tags</p>
+                <p className="text-sm text-gray-500 mb-2">Ambiance Tags</p>
                 <div className="flex flex-wrap gap-1">
                   {venue.ambiance_tags.map((tag) => (
-                    <Badge key={tag} variant="secondary">{tag}</Badge>
+                    <span key={tag} className="text-xs bg-accent-50 text-accent-600 px-2.5 py-1 rounded-full">{tag}</span>
                   ))}
                 </div>
               </div>
             )}
             {venue.opening_hours && (
               <div>
-                <p className="text-sm text-muted-foreground mb-2">Opening Hours</p>
+                <p className="text-sm text-gray-500 mb-2">Opening Hours</p>
                 <div className="text-sm space-y-1">
                   {Object.entries(venue.opening_hours).map(([day, hours]) => (
-                    <div key={day} className="flex justify-between">
+                    <div key={day} className="flex justify-between text-gray-700">
                       <span className="capitalize">{day}</span>
                       <span>{hours.open} - {hours.close}</span>
                     </div>
@@ -175,11 +177,11 @@ export default function VenueDetailPage({ params }: { params: Promise<{ id: stri
               </div>
             )}
             <div>
-              <p className="text-sm text-muted-foreground">Created</p>
-              <p className="text-sm">{new Date(venue.created_at).toLocaleDateString()}</p>
+              <p className="text-sm text-gray-500">Created</p>
+              <p className="text-sm text-gray-700">{new Date(venue.created_at).toLocaleDateString()}</p>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   );

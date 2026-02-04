@@ -63,7 +63,7 @@ export default function RewardCatalog() {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {[1, 2, 3, 4, 5, 6].map((i) => (
-          <div key={i} className="animate-pulse h-48 bg-gray-100 rounded-lg"></div>
+          <div key={i} className="skeleton h-48 rounded-2xl"></div>
         ))}
       </div>
     );
@@ -72,14 +72,15 @@ export default function RewardCatalog() {
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {rewards.map((reward) => (
-          <RewardCard
-            key={reward.id}
-            reward={reward}
-            userBalance={balance}
-            onRedeem={handleRedeemClick}
-            redeeming={redeeming === reward.id}
-          />
+        {rewards.map((reward, index) => (
+          <div key={reward.id} className="animate-slide-up" style={{ animationDelay: `${index * 0.05}s` }}>
+            <RewardCard
+              reward={reward}
+              userBalance={balance}
+              onRedeem={handleRedeemClick}
+              redeeming={redeeming === reward.id}
+            />
+          </div>
         ))}
       </div>
 

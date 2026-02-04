@@ -511,6 +511,7 @@ export async function POST(request: NextRequest) {
         bio: 'Love exploring new places and trying new recipes!',
         real_name: 'Alice Smith',
         occupation: 'UX Designer',
+        photo_url: 'https://randomuser.me/api/portraits/women/1.jpg',
       },
       {
         id: bobId,
@@ -521,6 +522,7 @@ export async function POST(request: NextRequest) {
         bio: 'Gamer and tech enthusiast looking for meaningful connections.',
         real_name: 'Bob Johnson',
         occupation: 'Software Engineer',
+        photo_url: 'https://randomuser.me/api/portraits/men/1.jpg',
       },
       {
         id: charlieId,
@@ -531,6 +533,7 @@ export async function POST(request: NextRequest) {
         bio: 'Artist who loves nature and good conversations.',
         real_name: 'Charlie Brown',
         occupation: 'Graphic Designer',
+        photo_url: 'https://randomuser.me/api/portraits/men/2.jpg',
       },
       {
         id: dianaId,
@@ -541,6 +544,7 @@ export async function POST(request: NextRequest) {
         bio: 'Foodie who loves discovering new restaurants and live music.',
         real_name: 'Diana Lee',
         occupation: 'Marketing Manager',
+        photo_url: 'https://randomuser.me/api/portraits/women/2.jpg',
       },
       {
         id: emmaId,
@@ -551,6 +555,7 @@ export async function POST(request: NextRequest) {
         bio: 'Digital artist and competitive gamer looking for fellow enthusiasts.',
         real_name: 'Emma Chen',
         occupation: 'Game Designer',
+        photo_url: 'https://randomuser.me/api/portraits/women/3.jpg',
       },
       {
         id: frankId,
@@ -561,6 +566,7 @@ export async function POST(request: NextRequest) {
         bio: 'Travel photographer who loves outdoor adventures.',
         real_name: 'Frank Wilson',
         occupation: 'Photographer',
+        photo_url: 'https://randomuser.me/api/portraits/men/3.jpg',
       },
       {
         id: graceId,
@@ -571,6 +577,7 @@ export async function POST(request: NextRequest) {
         bio: 'Home chef and music lover seeking creative connections.',
         real_name: 'Grace Kim',
         occupation: 'Pastry Chef',
+        photo_url: 'https://randomuser.me/api/portraits/women/4.jpg',
       },
       {
         id: henryId,
@@ -581,16 +588,17 @@ export async function POST(request: NextRequest) {
         bio: 'Gamer and movie buff who enjoys exploring new places.',
         real_name: 'Henry Park',
         occupation: 'Product Manager',
+        photo_url: 'https://randomuser.me/api/portraits/men/4.jpg',
       },
     ];
 
     for (const user of demoUsers) {
       const referralCode = `${user.display_name?.toUpperCase().slice(0, 4)}${crypto.randomUUID().slice(0, 6).toUpperCase()}`;
       await sql`
-        INSERT INTO users (id, email, password_hash, display_name, playing_style, interests, bio, real_name, occupation, referral_code, subscription_tier)
+        INSERT INTO users (id, email, password_hash, display_name, playing_style, interests, bio, real_name, occupation, photo_url, referral_code, subscription_tier)
         VALUES (${user.id}, ${user.email}, ${passwordHash}, ${user.display_name},
                 ${JSON.stringify(user.playing_style)}, ${JSON.stringify(user.interests)},
-                ${user.bio}, ${user.real_name}, ${user.occupation}, ${referralCode}, 'free')
+                ${user.bio}, ${user.real_name}, ${user.occupation}, ${user.photo_url}, ${referralCode}, 'free')
       `;
     }
 
@@ -742,14 +750,14 @@ export async function POST(request: NextRequest) {
 
     // Seed date venues
     await sql`
-      INSERT INTO date_venues (merchant_id, name, venue_type, description, address, location_lat, location_lng, price_range, cuisine_type, ambiance_tags, booking_enabled, rating, is_active)
+      INSERT INTO date_venues (merchant_id, name, venue_type, description, address, location_lat, location_lng, price_range, cuisine_type, ambiance_tags, booking_enabled, photos, rating, is_active)
       VALUES
-        (${merchant1Id}, 'Cafe Romantique - Thonglor', 'cafe', 'Intimate cafe with amazing coffee and desserts', '123 Thonglor Soi 10, Bangkok', 13.7326, 100.5847, 2, 'cafe', '["romantic", "quiet", "cozy"]', true, 4.5, true),
-        (${merchant1Id}, 'Cafe Romantique - Ari', 'cafe', 'Garden cafe with relaxing atmosphere', '45 Ari Soi 4, Bangkok', 13.7902, 100.5448, 2, 'cafe', '["garden", "relaxing", "instagram"]', true, 4.3, true),
-        (${merchant2Id}, 'Adventure Park - Escape Room', 'entertainment', 'Exciting escape room challenges for couples', '456 Ratchada Rd, Bangkok', 13.7645, 100.5742, 3, NULL, '["exciting", "teamwork", "fun"]', true, 4.7, true),
-        (${merchant2Id}, 'Adventure Park - Mini Golf', 'entertainment', 'Fun mini golf course with drinks', '456 Ratchada Rd, Bangkok', 13.7645, 100.5742, 2, NULL, '["fun", "casual", "outdoor"]', true, 4.2, true),
-        (NULL, 'Sky Bar Bangkok', 'bar', 'Rooftop bar with stunning city views', '789 Silom Rd, Bangkok', 13.7220, 100.5260, 4, 'bar', '["rooftop", "romantic", "views"]', false, 4.8, true),
-        (NULL, 'Dinner in the Sky', 'restaurant', 'Unique dining experience 50m in the air', '999 Asok Rd, Bangkok', 13.7380, 100.5607, 5, 'fine_dining', '["unique", "memorable", "luxury"]', true, 4.9, true)
+        (${merchant1Id}, 'Cafe Romantique - Thonglor', 'cafe', 'Intimate cafe with amazing coffee and desserts', '123 Thonglor Soi 10, Bangkok', 13.7326, 100.5847, 2, 'cafe', '["romantic", "quiet", "cozy"]', true, '["https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800", "https://images.unsplash.com/photo-1559925393-8be0ec4767c8?w=800"]', 4.5, true),
+        (${merchant1Id}, 'Cafe Romantique - Ari', 'cafe', 'Garden cafe with relaxing atmosphere', '45 Ari Soi 4, Bangkok', 13.7902, 100.5448, 2, 'cafe', '["garden", "relaxing", "instagram"]', true, '["https://images.unsplash.com/photo-1600093463592-8e36ae95ef56?w=800", "https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=800"]', 4.3, true),
+        (${merchant2Id}, 'Adventure Park - Escape Room', 'entertainment', 'Exciting escape room challenges for couples', '456 Ratchada Rd, Bangkok', 13.7645, 100.5742, 3, NULL, '["exciting", "teamwork", "fun"]', true, '["https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=800", "https://images.unsplash.com/photo-1595855759920-86582396756a?w=800"]', 4.7, true),
+        (${merchant2Id}, 'Adventure Park - Mini Golf', 'entertainment', 'Fun mini golf course with drinks', '456 Ratchada Rd, Bangkok', 13.7645, 100.5742, 2, NULL, '["fun", "casual", "outdoor"]', true, '["https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=800", "https://images.unsplash.com/photo-1596727362302-b8d891c42ab8?w=800"]', 4.2, true),
+        (NULL, 'Sky Bar Bangkok', 'bar', 'Rooftop bar with stunning city views', '789 Silom Rd, Bangkok', 13.7220, 100.5260, 4, 'bar', '["rooftop", "romantic", "views"]', false, '["https://images.unsplash.com/photo-1566417713940-fe7c737a9ef2?w=800", "https://images.unsplash.com/photo-1470337458703-46ad1756a187?w=800"]', 4.8, true),
+        (NULL, 'Dinner in the Sky', 'restaurant', 'Unique dining experience 50m in the air', '999 Asok Rd, Bangkok', 13.7380, 100.5607, 5, 'fine_dining', '["unique", "memorable", "luxury"]', true, '["https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800", "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800"]', 4.9, true)
     `;
 
     // Seed a demo campaign

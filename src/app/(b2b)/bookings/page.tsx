@@ -36,10 +36,10 @@ export default function BookingsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between animate-slide-up">
         <div>
-          <h1 className="text-2xl font-bold">Booking Management</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-3xl font-extrabold gradient-text">Booking Management</h1>
+          <p className="text-gray-500 mt-1">
             Manage and track all your venue bookings
           </p>
         </div>
@@ -61,7 +61,9 @@ export default function BookingsPage() {
         )}
       </div>
 
-      <B2BBookingList venueId={selectedVenue === 'all' ? undefined : selectedVenue} />
+      <div className="animate-slide-up" style={{ animationDelay: '0.1s' }}>
+        <B2BBookingList venueId={selectedVenue === 'all' ? undefined : selectedVenue} />
+      </div>
     </div>
   );
 }

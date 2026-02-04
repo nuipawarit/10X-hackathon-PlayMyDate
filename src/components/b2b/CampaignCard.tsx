@@ -1,8 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import type { Campaign } from '@/lib/services/campaign';
 
@@ -16,50 +14,48 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
   const progress = budget > 0 ? (spent / budget) * 100 : 0;
 
   const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'active':
-        return <Badge className="bg-green-500">Active</Badge>;
-      case 'draft':
-        return <Badge variant="secondary">Draft</Badge>;
-      case 'paused':
-        return <Badge variant="outline">Paused</Badge>;
-      case 'completed':
-        return <Badge>Completed</Badge>;
-      case 'cancelled':
-        return <Badge variant="destructive">Cancelled</Badge>;
-      default:
-        return <Badge variant="outline">{status}</Badge>;
-    }
+    const styles: Record<string, string> = {
+      active: 'bg-green-100 text-green-700',
+      draft: 'bg-gray-100 text-gray-600',
+      paused: 'bg-amber-100 text-amber-700',
+      completed: 'bg-blue-100 text-blue-700',
+      cancelled: 'bg-red-100 text-red-700',
+    };
+    return (
+      <span className={`text-xs font-medium px-2.5 py-1 rounded-full capitalize ${styles[status] || 'bg-gray-100 text-gray-600'}`}>
+        {status}
+      </span>
+    );
   };
 
   return (
     <Link href={`/b2b/campaigns/${campaign.id}`}>
-      <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-        <CardHeader className="flex flex-row items-start justify-between space-y-0">
+      <div className="card-hover">
+        <div className="flex items-start justify-between mb-3">
           <div>
-            <CardTitle className="text-lg">{campaign.name}</CardTitle>
-            <p className="text-sm text-muted-foreground">{campaign.type}</p>
+            <h3 className="font-semibold text-lg text-gray-800">{campaign.name}</h3>
+            <p className="text-sm text-gray-500 capitalize">{campaign.type}</p>
           </div>
           {getStatusBadge(campaign.status)}
-        </CardHeader>
-        <CardContent className="space-y-4">
+        </div>
+        <div className="space-y-4">
           {campaign.description && (
-            <p className="text-sm text-muted-foreground line-clamp-2">
+            <p className="text-sm text-gray-500 line-clamp-2">
               {campaign.description}
             </p>
           )}
 
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span>Budget Used</span>
-              <span>
+              <span className="text-gray-400">Budget Used</span>
+              <span className="text-gray-700">
                 ฿{spent.toLocaleString()} / ฿{budget.toLocaleString()}
               </span>
             </div>
             <Progress value={progress} />
           </div>
 
-          <div className="flex justify-between text-xs text-muted-foreground">
+          <div className="flex justify-between text-xs text-gray-400">
             {campaign.start_date && (
               <span>
                 Start: {new Date(campaign.start_date).toLocaleDateString()}
@@ -71,8 +67,8 @@ export function CampaignCard({ campaign }: CampaignCardProps) {
               </span>
             )}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </Link>
   );
 }

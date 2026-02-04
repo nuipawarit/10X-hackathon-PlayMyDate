@@ -1,8 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import type { DateVenue } from '@/lib/services/venue';
 
 interface VenueCardProps {
@@ -16,8 +14,8 @@ export function VenueCard({ venue }: VenueCardProps) {
 
   return (
     <Link href={`/dates/venues/${venue.id}`}>
-      <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
-        <div className="aspect-video bg-muted relative overflow-hidden rounded-t-lg">
+      <div className="card-hover h-full">
+        <div className="aspect-video bg-gray-100 relative overflow-hidden rounded-t-2xl -mx-6 -mt-6 mb-4">
           {venue.photos && venue.photos.length > 0 ? (
             <img
               src={venue.photos[0]}
@@ -25,52 +23,52 @@ export function VenueCard({ venue }: VenueCardProps) {
               className="object-cover w-full h-full"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+            <div className="w-full h-full flex items-center justify-center text-gray-400">
               No Image
             </div>
           )}
           {venue.rating && (
-            <Badge className="absolute top-2 right-2" variant="secondary">
+            <span className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-xs font-bold bg-white/90 backdrop-blur-sm shadow-lg text-amber-600">
               ⭐ {venue.rating}
-            </Badge>
+            </span>
           )}
         </div>
-        <CardContent className="p-4 space-y-2">
+        <div className="space-y-2">
           <div className="flex items-start justify-between gap-2">
-            <h3 className="font-semibold text-lg line-clamp-1">{venue.name}</h3>
+            <h3 className="font-semibold text-lg text-gray-800 line-clamp-1">{venue.name}</h3>
             {priceRangeDisplay && (
-              <span className="text-muted-foreground text-sm shrink-0">
+              <span className="text-gray-400 text-sm shrink-0">
                 {priceRangeDisplay}
               </span>
             )}
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <Badge variant="outline">{venue.venue_type}</Badge>
+            <span className="text-xs bg-primary-50 text-primary-600 px-2.5 py-1 rounded-full">{venue.venue_type}</span>
             {venue.cuisine_type && (
-              <Badge variant="outline">{venue.cuisine_type}</Badge>
+              <span className="text-xs bg-secondary-50 text-secondary-600 px-2.5 py-1 rounded-full">{venue.cuisine_type}</span>
             )}
           </div>
           {venue.description && (
-            <p className="text-sm text-muted-foreground line-clamp-2">
+            <p className="text-sm text-gray-500 line-clamp-2">
               {venue.description}
             </p>
           )}
           {venue.address && (
-            <p className="text-xs text-muted-foreground truncate">
+            <p className="text-xs text-gray-400 truncate">
               📍 {venue.address}
             </p>
           )}
           {venue.ambiance_tags && venue.ambiance_tags.length > 0 && (
             <div className="flex gap-1 flex-wrap">
               {venue.ambiance_tags.slice(0, 3).map((tag) => (
-                <Badge key={tag} variant="secondary" className="text-xs">
+                <span key={tag} className="text-xs bg-accent-50 text-accent-600 px-2 py-0.5 rounded-full">
                   {tag}
-                </Badge>
+                </span>
               ))}
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </Link>
   );
 }

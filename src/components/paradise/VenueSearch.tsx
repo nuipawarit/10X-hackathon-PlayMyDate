@@ -1,8 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
@@ -50,7 +48,7 @@ export function VenueSearch({ onSearch }: VenueSearchProps) {
   };
 
   return (
-    <div className="space-y-4 p-4 bg-muted/50 rounded-lg">
+    <div className="card space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Select value={venueType} onValueChange={setVenueType}>
           <SelectTrigger>
@@ -106,10 +104,10 @@ export function VenueSearch({ onSearch }: VenueSearchProps) {
       </div>
 
       <div className="flex gap-2">
-        <Button onClick={handleSearch}>Search</Button>
-        <Button variant="outline" onClick={handleReset}>
+        <button className="btn-primary" onClick={handleSearch}>Search</button>
+        <button className="btn-secondary" onClick={handleReset}>
           Reset
-        </Button>
+        </button>
       </div>
     </div>
   );

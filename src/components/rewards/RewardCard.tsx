@@ -1,8 +1,5 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import type { Reward } from '@/lib/api';
 
 interface RewardCardProps {
@@ -26,54 +23,49 @@ export default function RewardCard({ reward, userBalance, onRedeem, redeeming }:
     return icons[type] || '🎁';
   };
 
-  const getTypeBadgeVariant = (type: string): 'default' | 'secondary' | 'destructive' | 'outline' => {
-    const variants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
-      powerup: 'default',
-      avatar_item: 'secondary',
-      voucher: 'destructive',
-      partner_exchange: 'outline',
+  const getTypeBadgeStyle = (type: string) => {
+    const styles: Record<string, string> = {
+      powerup: 'bg-purple-100 text-purple-700',
+      avatar_item: 'bg-blue-100 text-blue-700',
+      voucher: 'bg-rose-100 text-rose-700',
+      partner_exchange: 'bg-orange-100 text-orange-700',
     };
-    return variants[type] || 'default';
+    return styles[type] || 'bg-gray-100 text-gray-700';
   };
 
   return (
-    <Card className={`${!canAfford || isOutOfStock ? 'opacity-60' : ''} hover:shadow-md transition-shadow`}>
-      <CardContent className="pt-6">
-        <div className="flex items-start justify-between mb-3">
-          <span className="text-3xl">{getTypeIcon(reward.type)}</span>
-          <Badge variant={getTypeBadgeVariant(reward.type)} className="capitalize">
-            {reward.type.replace('_', ' ')}
-          </Badge>
-        </div>
-        <h3 className="font-semibold mb-1">{reward.name}</h3>
-        <p className="text-sm text-muted-foreground mb-3">{reward.description}</p>
-        <div className="flex items-center justify-between">
-          <span className="font-bold text-yellow-600">
-            🪙 {reward.coin_cost.toLocaleString()}
+    <div className={`card-hover ${!canAfford || isOutOfStock ? 'opacity-60 grayscale' : ''}`}>
+      <div className="flex items-start justify-between mb-3">
+        <span className="text-3xl">{getTypeIcon(reward.type)}</span>
+        <span className={`text-xs font-medium px-2.5 py-1 rounded-full capitalize ${getTypeBadgeStyle(reward.type)}`}>
+          {reward.type.replace('_', ' ')}
+        </span>
+      </div>
+      <h3 className="font-semibold text-gray-800 mb-1">{reward.name}</h3>
+      <p className="text-sm text-gray-500 mb-3">{reward.description}</p>
+      <div className="flex items-center justify-between mb-4">
+        <span className="font-bold text-amber-600">
+          🪙 {reward.coin_cost.toLocaleString()}
+        </span>
+        {reward.stock_quantity !== null && (
+          <span className="text-xs text-gray-400">
+            {isOutOfStock ? 'Out of stock' : `${reward.stock_quantity} left`}
           </span>
-          {reward.stock_quantity !== null && (
-            <span className="text-xs text-muted-foreground">
-              {isOutOfStock ? 'Out of stock' : `${reward.stock_quantity} left`}
-            </span>
-          )}
-        </div>
-      </CardContent>
-      <CardFooter>
-        <Button
-          onClick={() => onRedeem(reward.id)}
-          disabled={!canAfford || isOutOfStock || redeeming}
-          className="w-full"
-          variant={canAfford && !isOutOfStock ? 'default' : 'outline'}
-        >
-          {redeeming
-            ? 'Redeeming...'
-            : isOutOfStock
-              ? 'Out of Stock'
-              : !canAfford
-                ? 'Not Enough Coins'
-                : 'Redeem'}
-        </Button>
-      </CardFooter>
-    </Card>
+        )}
+      </div>
+      <button
+        onClick={() => onRedeem(reward.id)}
+        disabled={!canAfford || isOutOfStock || redeeming}
+        className={`w-full ${canAfford && !isOutOfStock ? 'btn-primary' : 'btn-secondary opacity-50 cursor-not-allowed'}`}
+      >
+        {redeeming
+          ? 'Redeeming...'
+          : isOutOfStock
+            ? 'Out of Stock'
+            : !canAfford
+              ? 'Not Enough Coins'
+              : 'Redeem'}
+      </button>
+    </div>
   );
 }

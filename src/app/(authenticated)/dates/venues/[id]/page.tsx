@@ -3,7 +3,6 @@
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { VenueDetail, BookingForm, BookingConfirmation, type BookingFormData } from '@/components/paradise';
-import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -125,8 +124,15 @@ export default function VenueDetailPage({ params }: { params: Promise<{ id: stri
 
   if (loading) {
     return (
-      <div className="container mx-auto py-12 text-center">
-        <p className="text-muted-foreground">Loading venue...</p>
+      <div className="container mx-auto py-12 max-w-3xl">
+        <div className="card text-center py-16 animate-bounce-in">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-3xl bg-gradient-to-br from-purple-100 to-orange-100 flex items-center justify-center animate-float">
+            <svg className="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+          </div>
+          <p className="text-gray-500">Loading venue...</p>
+        </div>
       </div>
     );
   }
@@ -145,19 +151,21 @@ export default function VenueDetailPage({ params }: { params: Promise<{ id: stri
 
   return (
     <div className="container mx-auto py-6 max-w-3xl">
-      <Button variant="ghost" onClick={() => router.back()} className="mb-4">
+      <button onClick={() => router.back()} className="btn-secondary mb-4 animate-slide-up">
         ← Back
-      </Button>
+      </button>
 
-      <VenueDetail venue={venue} onBook={handleBookClick} />
+      <div className="animate-slide-up" style={{ animationDelay: '0.1s' }}>
+        <VenueDetail venue={venue} onBook={handleBookClick} />
+      </div>
 
       <Dialog open={showMatchSelect} onOpenChange={setShowMatchSelect}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Select a Match</DialogTitle>
+            <DialogTitle className="gradient-text">Select a Match</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <p className="text-muted-foreground">
+            <p className="text-gray-500">
               Who do you want to book this venue with?
             </p>
             <Select onValueChange={handleMatchSelect}>

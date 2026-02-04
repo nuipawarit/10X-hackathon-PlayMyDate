@@ -29,7 +29,7 @@ const PARTNERS: ExchangePartner[] = [
   {
     id: 'partner-starbucks',
     name: 'Starbucks',
-    logoUrl: '/partners/starbucks.png',
+    logoUrl: 'https://ui-avatars.com/api/?name=Starbucks&background=00704A&color=fff&size=128&bold=true',
     description: 'Exchange PlayCoins for Starbucks e-Vouchers',
     exchangeRate: 100,
     minAmount: 100,
@@ -40,7 +40,7 @@ const PARTNERS: ExchangePartner[] = [
   {
     id: 'partner-grab',
     name: 'Grab',
-    logoUrl: '/partners/grab.png',
+    logoUrl: 'https://ui-avatars.com/api/?name=Grab&background=00B14F&color=fff&size=128&bold=true',
     description: 'Exchange PlayCoins for Grab credits',
     exchangeRate: 80,
     minAmount: 200,
@@ -51,7 +51,7 @@ const PARTNERS: ExchangePartner[] = [
   {
     id: 'partner-lineman',
     name: 'LINE MAN',
-    logoUrl: '/partners/lineman.png',
+    logoUrl: 'https://ui-avatars.com/api/?name=LM&background=00C300&color=fff&size=128&bold=true',
     description: 'Exchange PlayCoins for LINE MAN vouchers',
     exchangeRate: 90,
     minAmount: 100,
@@ -62,7 +62,7 @@ const PARTNERS: ExchangePartner[] = [
   {
     id: 'partner-major',
     name: 'Major Cineplex',
-    logoUrl: '/partners/major.png',
+    logoUrl: 'https://ui-avatars.com/api/?name=MC&background=E31837&color=fff&size=128&bold=true',
     description: 'Exchange PlayCoins for movie tickets',
     exchangeRate: 150,
     minAmount: 300,

@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 import { DashboardOverview, CampaignList } from '@/components/b2b';
 import type { Campaign } from '@/lib/services/campaign';
 import type { DateVenue } from '@/lib/services/venue';
@@ -41,8 +40,17 @@ export default function B2BDashboardPage() {
 
   if (loading) {
     return (
-      <div className="text-center py-12">
-        <p className="text-muted-foreground">Loading dashboard...</p>
+      <div className="space-y-8">
+        <div>
+          <div className="skeleton h-9 w-40" />
+          <div className="skeleton h-5 w-64 mt-2" />
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="skeleton h-32 rounded-2xl" />
+          ))}
+        </div>
+        <div className="skeleton h-64 rounded-2xl" />
       </div>
     );
   }
@@ -51,34 +59,43 @@ export default function B2BDashboardPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold">Dashboard</h1>
-        <p className="text-muted-foreground">
+      <div className="animate-slide-up">
+        <h1 className="text-3xl font-extrabold gradient-text">Dashboard</h1>
+        <p className="text-gray-500 mt-1">
           Overview of your business performance
         </p>
       </div>
 
-      <DashboardOverview campaigns={campaigns} venueCount={venues.length} />
+      <div className="animate-slide-up" style={{ animationDelay: '0.1s' }}>
+        <DashboardOverview campaigns={campaigns} venueCount={venues.length} />
+      </div>
 
-      <div className="space-y-4">
+      <div className="space-y-4 animate-slide-up" style={{ animationDelay: '0.15s' }}>
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold">Recent Campaigns</h2>
+          <h2 className="text-xl font-semibold text-gray-800">Recent Campaigns</h2>
           <Link href="/b2b/campaigns">
-            <Button variant="outline" size="sm">
+            <button className="btn-secondary text-sm">
               View All
-            </Button>
+            </button>
           </Link>
         </div>
 
         <CampaignList campaigns={recentCampaigns} />
 
         {campaigns.length === 0 && (
-          <div className="text-center py-8">
-            <p className="text-muted-foreground mb-4">
-              You haven't created any campaigns yet
+          <div className="card text-center py-12 animate-bounce-in">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-3xl bg-gradient-to-br from-purple-100 to-rose-100 flex items-center justify-center animate-float">
+              <svg className="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-bold text-gray-800 mb-2">No campaigns yet</h3>
+            <p className="text-gray-500 mb-6">
+              Create your first campaign to start reaching customers
             </p>
             <Link href="/b2b/campaigns">
-              <Button>Create Your First Campaign</Button>
+              <button className="btn-primary">Create Your First Campaign</button>
             </Link>
           </div>
         )}
