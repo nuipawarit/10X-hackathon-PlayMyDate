@@ -49,7 +49,7 @@ export function QuestBuilder({ campaignId, onSave }: QuestBuilderProps) {
 
       if (res.ok) {
         onSave?.();
-        router.push('/quests');
+        router.push('/b2b/quests');
         router.refresh();
       }
     } finally {

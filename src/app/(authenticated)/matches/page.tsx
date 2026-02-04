@@ -103,10 +103,10 @@ export default function Matches() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Your Matches</h1>
-          <p className="text-sm text-gray-500 mt-1">Connect through shared activities</p>
+          <h1 className="text-3xl font-extrabold gradient-text">Your Matches</h1>
+          <p className="text-gray-500 mt-2">Connect through shared activities ✨</p>
         </div>
         <button
           onClick={handleFindMatches}
@@ -115,7 +115,7 @@ export default function Matches() {
         >
           {finding ? (
             <>
-              <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+              <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
               </svg>
@@ -123,9 +123,7 @@ export default function Matches() {
             </>
           ) : (
             <>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
+              <span className="text-lg">💕</span>
               Find Matches
             </>
           )}
@@ -154,18 +152,18 @@ export default function Matches() {
       )}
 
       {matches.length === 0 ? (
-        <div className="card text-center py-16 animate-fade-in">
-          <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-primary-100 to-secondary-100 flex items-center justify-center">
-            <svg className="w-10 h-10 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="card text-center py-20 animate-bounce-in">
+          <div className="w-24 h-24 mx-auto mb-8 rounded-3xl bg-gradient-to-br from-purple-100 to-rose-100 flex items-center justify-center animate-float">
+            <svg className="w-12 h-12 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
             </svg>
           </div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-2">No matches yet</h3>
-          <p className="text-gray-500 mb-6 max-w-sm mx-auto">
+          <h3 className="text-xl font-bold text-gray-800 mb-3">No matches yet 💫</h3>
+          <p className="text-gray-500 mb-8 max-w-sm mx-auto">
             Click &quot;Find Matches&quot; to discover people who share your interests and playing style
           </p>
           <button onClick={handleFindMatches} className="btn-primary">
-            Start Discovering
+            ✨ Start Discovering
           </button>
         </div>
       ) : (
@@ -187,7 +185,7 @@ export default function Matches() {
                       {partner?.display_name || 'Anonymous'}
                     </h3>
                     {match.paradise_mode_unlocked && (
-                      <span className="text-xs bg-gradient-to-r from-pink-500 to-orange-400 text-white px-2 py-0.5 rounded-full">
+                      <span className="badge-paradise">
                         🏝️ Paradise
                       </span>
                     )}
@@ -236,8 +234,8 @@ export default function Matches() {
                       />
                       <defs>
                         <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                          <stop offset="0%" stopColor="#a855f7" />
-                          <stop offset="100%" stopColor="#14b8a6" />
+                          <stop offset="0%" stopColor="#8b5cf6" />
+                          <stop offset="100%" stopColor="#f43f5e" />
                         </linearGradient>
                       </defs>
                     </svg>

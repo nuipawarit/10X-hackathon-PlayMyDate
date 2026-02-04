@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -223,39 +224,41 @@ export default function B2BVenuesPage() {
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {venues.map((venue) => (
-            <Card key={venue.id}>
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <CardTitle className="text-lg">{venue.name}</CardTitle>
-                  <Badge variant={venue.is_active ? 'default' : 'secondary'}>
-                    {venue.is_active ? 'Active' : 'Inactive'}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <div className="flex gap-2">
-                  <Badge variant="outline">{venue.venue_type}</Badge>
-                  {venue.cuisine_type && (
-                    <Badge variant="outline">{venue.cuisine_type}</Badge>
-                  )}
-                  {venue.price_range && (
-                    <Badge variant="outline">
-                      {'฿'.repeat(venue.price_range)}
+            <Link key={venue.id} href={`/b2b/venues/${venue.id}`}>
+              <Card className="cursor-pointer hover:border-primary transition-colors">
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <CardTitle className="text-lg">{venue.name}</CardTitle>
+                    <Badge variant={venue.is_active ? 'default' : 'secondary'}>
+                      {venue.is_active ? 'Active' : 'Inactive'}
                     </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <div className="flex gap-2">
+                    <Badge variant="outline">{venue.venue_type}</Badge>
+                    {venue.cuisine_type && (
+                      <Badge variant="outline">{venue.cuisine_type}</Badge>
+                    )}
+                    {venue.price_range && (
+                      <Badge variant="outline">
+                        {'฿'.repeat(venue.price_range)}
+                      </Badge>
+                    )}
+                  </div>
+                  {venue.description && (
+                    <p className="text-sm text-muted-foreground line-clamp-2">
+                      {venue.description}
+                    </p>
                   )}
-                </div>
-                {venue.description && (
-                  <p className="text-sm text-muted-foreground line-clamp-2">
-                    {venue.description}
-                  </p>
-                )}
-                {venue.address && (
-                  <p className="text-xs text-muted-foreground">
-                    📍 {venue.address}
-                  </p>
-                )}
-              </CardContent>
-            </Card>
+                  {venue.address && (
+                    <p className="text-xs text-muted-foreground">
+                      📍 {venue.address}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
       )}

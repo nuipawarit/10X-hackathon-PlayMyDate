@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/components/AuthProvider';
 import { updateProfile, updatePrivateData } from '@/lib/api';
+import { PhotoUploader } from '@/components/profile';
 
 const PLAYING_STYLES = [
   { id: 'adventurous', icon: '🏔️', label: 'Adventurous' },
@@ -75,9 +76,9 @@ export default function Profile() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <div className="mb-6 animate-slide-up">
-        <h1 className="text-2xl font-bold gradient-text">Your Profile</h1>
-        <p className="text-gray-500 text-sm mt-1">Customize how others see you</p>
+      <div className="mb-8 animate-slide-up">
+        <h1 className="text-3xl font-extrabold gradient-text">Your Profile</h1>
+        <p className="text-gray-500 mt-2">Customize how others see you ✨</p>
       </div>
 
       {message && (
@@ -101,15 +102,15 @@ export default function Profile() {
         </div>
       )}
 
-      <div className="card mb-6 animate-slide-up" style={{ animationDelay: '0.1s' }}>
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-100 to-secondary-100 flex items-center justify-center">
-            <svg className="w-5 h-5 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="card mb-6 animate-slide-up-elastic" style={{ animationDelay: '0.1s' }}>
+        <div className="flex items-center gap-4 mb-6">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-rose-500 flex items-center justify-center shadow-lg">
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
           </div>
           <div>
-            <h2 className="font-semibold text-lg text-gray-800">Public Profile</h2>
+            <h2 className="font-bold text-xl text-gray-800">Public Profile</h2>
             <p className="text-sm text-gray-500">Visible to your matches</p>
           </div>
         </div>
@@ -141,23 +142,22 @@ export default function Profile() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">
-              Playing Style
+            <label className="block text-sm font-semibold text-gray-700 mb-3">
+              Playing Style 🎮
             </label>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {PLAYING_STYLES.map((style) => (
                 <button
                   key={style.id}
                   type="button"
                   onClick={() => toggleItem(style.id, playingStyle, setPlayingStyle)}
-                  className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                  className={`flex items-center gap-2 px-4 py-3.5 rounded-2xl text-sm font-semibold transition-all duration-300 border-2 ${
                     playingStyle.includes(style.id)
-                      ? 'bg-gradient-to-r from-primary-500 to-secondary-500 text-white scale-105'
-                      : 'bg-gray-50 text-gray-700 hover:bg-gray-100 hover:scale-[1.02]'
+                      ? 'bg-gradient-to-r from-purple-500 to-rose-500 text-white border-transparent shadow-lg scale-105'
+                      : 'bg-gray-50/80 text-gray-700 border-transparent hover:bg-purple-50 hover:border-purple-200 hover:text-purple-700 hover:scale-[1.02]'
                   }`}
-                  style={playingStyle.includes(style.id) ? { boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)' } : undefined}
                 >
-                  <span className="text-lg">{style.icon}</span>
+                  <span className="text-xl">{style.icon}</span>
                   {style.label}
                 </button>
               ))}
@@ -165,23 +165,22 @@ export default function Profile() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">
-              Interests
+            <label className="block text-sm font-semibold text-gray-700 mb-3">
+              Interests 💫
             </label>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {INTERESTS.map((interest) => (
                 <button
                   key={interest.id}
                   type="button"
                   onClick={() => toggleItem(interest.id, interests, setInterests)}
-                  className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                  className={`flex items-center gap-2 px-4 py-3.5 rounded-2xl text-sm font-semibold transition-all duration-300 border-2 ${
                     interests.includes(interest.id)
-                      ? 'bg-gradient-to-r from-secondary-500 to-primary-500 text-white scale-105'
-                      : 'bg-gray-50 text-gray-700 hover:bg-gray-100 hover:scale-[1.02]'
+                      ? 'bg-gradient-to-r from-rose-500 to-orange-500 text-white border-transparent shadow-lg scale-105'
+                      : 'bg-gray-50/80 text-gray-700 border-transparent hover:bg-rose-50 hover:border-rose-200 hover:text-rose-700 hover:scale-[1.02]'
                   }`}
-                  style={interests.includes(interest.id) ? { boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)' } : undefined}
                 >
-                  <span className="text-lg">{interest.icon}</span>
+                  <span className="text-xl">{interest.icon}</span>
                   {interest.label}
                 </button>
               ))}
@@ -190,15 +189,23 @@ export default function Profile() {
         </div>
       </div>
 
-      <div className="card mb-6 animate-slide-up" style={{ animationDelay: '0.2s' }}>
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent-100 to-accent-200 flex items-center justify-center">
-            <svg className="w-5 h-5 text-accent-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="mb-6 animate-slide-up" style={{ animationDelay: '0.15s' }}>
+        <PhotoUploader
+          currentPhotoUrl={user?.photo_url}
+          onSave={(url) => updateUser({ ...user!, photo_url: url })}
+          onDelete={() => updateUser({ ...user!, photo_url: null })}
+        />
+      </div>
+
+      <div className="card mb-6 animate-slide-up-elastic" style={{ animationDelay: '0.2s' }}>
+        <div className="flex items-center gap-4 mb-6">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg">
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
           </div>
           <div>
-            <h2 className="font-semibold text-lg text-gray-800">Private Information</h2>
+            <h2 className="font-bold text-xl text-gray-800">Private Information 🔐</h2>
             <p className="text-sm text-gray-500">Unlocked through intimacy levels</p>
           </div>
         </div>
@@ -206,8 +213,8 @@ export default function Profile() {
         <div className="space-y-5">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <label className="text-sm font-medium text-gray-700">Real Name</label>
-              <span className="text-xs bg-primary-100 text-primary-600 px-2 py-0.5 rounded-full">Level 1</span>
+              <label className="text-sm font-semibold text-gray-700">Real Name</label>
+              <span className="unlock-badge">🔓 Level 1</span>
             </div>
             <input
               type="text"
@@ -220,8 +227,8 @@ export default function Profile() {
 
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <label className="text-sm font-medium text-gray-700">Occupation</label>
-              <span className="text-xs bg-secondary-100 text-secondary-600 px-2 py-0.5 rounded-full">Level 3</span>
+              <label className="text-sm font-semibold text-gray-700">Occupation</label>
+              <span className="badge-paradise">🔓 Level 3</span>
             </div>
             <input
               type="text"
@@ -237,7 +244,7 @@ export default function Profile() {
       <button
         onClick={handleSave}
         disabled={saving}
-        className="btn-primary w-full animate-slide-up"
+        className="btn-primary w-full animate-slide-up-elastic"
         style={{ animationDelay: '0.3s' }}
       >
         {saving ? (
@@ -250,10 +257,7 @@ export default function Profile() {
           </span>
         ) : (
           <span className="flex items-center justify-center gap-2">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-            Save Profile
+            ✨ Save Profile
           </span>
         )}
       </button>

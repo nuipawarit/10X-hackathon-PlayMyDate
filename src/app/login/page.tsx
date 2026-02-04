@@ -44,25 +44,26 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-gradient-to-br from-purple-50 via-white to-rose-50">
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-secondary-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-accent-200 rounded-full mix-blend-multiply filter blur-xl opacity-50 animate-pulse-soft" />
+        <div className="absolute -top-40 -right-40 w-96 h-96 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-float-rotate" />
+        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-rose-200 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-float-rotate" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-1/4 right-1/4 w-72 h-72 bg-orange-200 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-pulse-soft" />
+        <div className="absolute bottom-1/4 left-1/3 w-64 h-64 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float" style={{ animationDelay: '1s' }} />
       </div>
 
-      <div className="card w-full max-w-md relative z-10 animate-scale-in">
+      <div className="card w-full max-w-md relative z-10 animate-bounce-in">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-500 to-secondary-500 mb-4 shadow-glow-primary animate-float">
-            <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-br from-purple-500 to-rose-500 mb-5 shadow-glow-primary animate-heart-beat">
+            <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
             </svg>
           </div>
-          <h1 className="text-3xl font-bold gradient-text mb-2">
+          <h1 className="text-4xl font-extrabold gradient-text mb-3">
             PlayMyDate
           </h1>
-          <p className="text-gray-500">
-            Connect through activities, not just photos
+          <p className="text-gray-500 text-lg">
+            Connect through activities, not just photos ✨
           </p>
         </div>
 
@@ -129,13 +130,13 @@ export default function Login() {
           </Link>
         </p>
 
-        <div className="mt-6 pt-6 border-t border-gray-100 animate-fade-in" style={{ animationDelay: '0.5s' }}>
-          <p className="text-xs text-gray-400 text-center mb-3">Demo Accounts (click to fill)</p>
-          <div className="space-y-2">
+        <div className="mt-8 pt-6 border-t border-gray-100/50 animate-fade-in" style={{ animationDelay: '0.5s' }}>
+          <p className="text-sm text-gray-400 text-center mb-4 font-medium">✨ Demo Accounts</p>
+          <div className="flex flex-wrap gap-2 justify-center">
             {[
-              { email: 'alice@demo.com', name: 'Alice' },
-              { email: 'bob@demo.com', name: 'Bob' },
-              { email: 'charlie@demo.com', name: 'Charlie' },
+              { email: 'alice@demo.com', name: 'Alice', emoji: '👩' },
+              { email: 'bob@demo.com', name: 'Bob', emoji: '👨' },
+              { email: 'charlie@demo.com', name: 'Charlie', emoji: '🧑' },
             ].map((demo) => (
               <button
                 key={demo.email}
@@ -144,15 +145,10 @@ export default function Login() {
                   setEmail(demo.email);
                   setPassword('password123');
                 }}
-                className="w-full text-left px-3 py-2 text-sm bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors flex items-center justify-between"
+                className="px-4 py-2.5 text-sm bg-gray-50 hover:bg-purple-50 hover:text-purple-700 rounded-2xl transition-all duration-300 flex items-center gap-2 border-2 border-transparent hover:border-purple-200 hover:scale-105"
               >
-                <span>
-                  <span className="font-medium text-gray-700">{demo.name}</span>
-                  <span className="text-gray-400 ml-2 text-xs">{demo.email}</span>
-                </span>
-                <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
+                <span className="text-lg">{demo.emoji}</span>
+                <span className="font-semibold">{demo.name}</span>
               </button>
             ))}
           </div>

@@ -54,23 +54,29 @@ export default function WalletBalance({ compact = false, showLifetime = false }:
   }
 
   return (
-    <Card className="bg-gradient-to-br from-yellow-50 to-amber-100 border-yellow-200">
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm text-muted-foreground">PlayCoin Balance</p>
-            <p className="text-3xl font-bold text-yellow-600">
-              🪙 {wallet.balance.toLocaleString()}
+    <div className="wallet-card rounded-3xl p-6 relative overflow-hidden">
+      <div className="absolute top-0 right-0 w-32 h-32 bg-amber-400/20 rounded-full -translate-y-1/2 translate-x-1/2" />
+      <div className="absolute bottom-0 left-0 w-24 h-24 bg-orange-400/20 rounded-full translate-y-1/2 -translate-x-1/2" />
+
+      <div className="relative flex items-center justify-between">
+        <div>
+          <p className="text-sm font-medium text-amber-700/70 mb-1">PlayCoin Balance</p>
+          <div className="flex items-center gap-2">
+            <span className="text-3xl">🪙</span>
+            <span className="coin-amount">{wallet.balance.toLocaleString()}</span>
+          </div>
+        </div>
+        {showLifetime && (
+          <div className="text-right space-y-1">
+            <p className="text-sm font-medium text-amber-700/70">
+              <span className="text-green-600">↑</span> Earned: {wallet.lifetime_earned.toLocaleString()}
+            </p>
+            <p className="text-sm font-medium text-amber-700/70">
+              <span className="text-rose-500">↓</span> Spent: {wallet.lifetime_spent.toLocaleString()}
             </p>
           </div>
-          {showLifetime && (
-            <div className="text-right text-sm text-muted-foreground">
-              <p>Lifetime Earned: {wallet.lifetime_earned.toLocaleString()}</p>
-              <p>Lifetime Spent: {wallet.lifetime_spent.toLocaleString()}</p>
-            </div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+        )}
+      </div>
+    </div>
   );
 }

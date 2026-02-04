@@ -41,19 +41,19 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="glass sticky top-0 z-10 border-b border-white/20">
-        <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-          <Link href="/matches" className="flex items-center gap-2 group">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow">
-              <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-purple-50/50 via-white to-rose-50/30">
+      <header className="header-glass">
+        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+          <Link href="/matches" className="flex items-center gap-3 group">
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-purple-500 to-rose-500 flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-all duration-300">
+              <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
               </svg>
             </div>
-            <span className="text-xl font-bold gradient-text">PlayMyDate</span>
+            <span className="text-xl font-extrabold gradient-text">PlayMyDate</span>
           </Link>
 
-          <nav className="flex items-center gap-2">
+          <nav className="flex items-center gap-1">
             <Link
               href="/matches"
               className={isActive('/matches') ? 'nav-link-active' : 'nav-link-inactive'}
@@ -63,6 +63,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                 </svg>
                 Matches
+              </span>
+            </Link>
+            <Link
+              href="/dates"
+              className={isActive('/dates') ? 'nav-link-active' : 'nav-link-inactive'}
+            >
+              <span className="flex items-center gap-2">
+                🗓️ Dates
               </span>
             </Link>
             <Link
@@ -79,24 +87,24 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
             <Link
               href="/wallet"
-              className={`${isActive('/wallet') || isActive('/rewards') ? 'nav-link-active' : 'nav-link-inactive'} flex items-center gap-1`}
+              className="coin-counter ml-2"
             >
-              <span className="text-yellow-500">🪙</span>
-              <span className="font-medium">{walletBalance !== null ? walletBalance.toLocaleString() : '...'}</span>
+              <span className="text-lg">🪙</span>
+              <span className="font-bold text-amber-700">{walletBalance !== null ? walletBalance.toLocaleString() : '...'}</span>
             </Link>
 
-            <div className="flex items-center gap-3 ml-2 pl-4 border-l border-gray-200">
-              <div className="flex items-center gap-2">
-                <div className="avatar w-8 h-8 text-sm">
+            <div className="flex items-center gap-3 ml-3 pl-4 border-l border-gray-200/50">
+              <div className="flex items-center gap-2.5">
+                <div className="avatar w-9 h-9 text-sm ring-2 ring-white shadow-md">
                   {user?.display_name?.[0]?.toUpperCase() || '?'}
                 </div>
-                <span className="text-sm font-medium text-gray-700 hidden sm:block">
+                <span className="text-sm font-semibold text-gray-700 hidden sm:block">
                   {user?.display_name || 'User'}
                 </span>
               </div>
               <button
                 onClick={logout}
-                className="text-sm text-gray-500 hover:text-gray-700 transition-colors p-2 hover:bg-gray-100 rounded-lg"
+                className="text-gray-400 hover:text-rose-500 transition-all duration-300 p-2 hover:bg-rose-50 rounded-xl"
                 title="Logout"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -114,13 +122,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </div>
       </main>
 
-      <footer className="py-4 text-center">
+      <footer className="py-6 text-center">
         <button
           onClick={handleResetDatabase}
           disabled={resetting}
-          className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+          className="text-xs text-gray-400 hover:text-rose-400 transition-all duration-300 px-4 py-2 rounded-xl hover:bg-rose-50"
         >
-          {resetting ? 'Resetting...' : 'Reset Database'}
+          {resetting ? '✨ Resetting...' : '🔄 Reset Database'}
         </button>
       </footer>
     </div>

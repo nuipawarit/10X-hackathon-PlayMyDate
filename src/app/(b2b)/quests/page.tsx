@@ -46,7 +46,7 @@ export default function QuestsPage() {
             Manage your branded quests and activities
           </p>
         </div>
-        <Link href="/quests/new">
+        <Link href="/b2b/quests/new">
           <Button>Create Quest</Button>
         </Link>
       </div>
@@ -68,7 +68,7 @@ export default function QuestsPage() {
         <Card>
           <CardContent className="py-12 text-center">
             <p className="text-muted-foreground mb-4">No quests created yet</p>
-            <Link href="/quests/new">
+            <Link href="/b2b/quests/new">
               <Button>Create Your First Quest</Button>
             </Link>
           </CardContent>
@@ -76,32 +76,34 @@ export default function QuestsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {quests.map((quest) => (
-            <Card key={quest.id}>
-              <CardHeader className="flex flex-row items-start justify-between space-y-0">
-                <CardTitle className="text-lg">{quest.name}</CardTitle>
-                <Badge variant={quest.is_active ? 'default' : 'secondary'}>
-                  {quest.is_active ? 'Active' : 'Inactive'}
-                </Badge>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {quest.description && (
-                  <p className="text-sm text-muted-foreground line-clamp-2">
-                    {quest.description}
-                  </p>
-                )}
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Reward</span>
-                  <span className="font-medium">{quest.coin_reward} coins</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Completions</span>
-                  <span className="font-medium">
-                    {quest.completion_count}
-                    {quest.max_completions && ` / ${quest.max_completions}`}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
+            <Link key={quest.id} href={`/b2b/quests/${quest.id}`}>
+              <Card className="cursor-pointer hover:border-primary transition-colors">
+                <CardHeader className="flex flex-row items-start justify-between space-y-0">
+                  <CardTitle className="text-lg">{quest.name}</CardTitle>
+                  <Badge variant={quest.is_active ? 'default' : 'secondary'}>
+                    {quest.is_active ? 'Active' : 'Inactive'}
+                  </Badge>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {quest.description && (
+                    <p className="text-sm text-muted-foreground line-clamp-2">
+                      {quest.description}
+                    </p>
+                  )}
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Reward</span>
+                    <span className="font-medium">{quest.coin_reward} coins</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Completions</span>
+                    <span className="font-medium">
+                      {quest.completion_count}
+                      {quest.max_completions && ` / ${quest.max_completions}`}
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
       )}

@@ -187,3 +187,101 @@ export async function getUserQuestCompletions(userId: string): Promise<ServiceRe
     return failure('Failed to get quest completions', 'INTERNAL_ERROR');
   }
 }
+
+export interface QuestWithCampaign extends BrandedQuest {
+  campaign_name?: string;
+}
+
+export async function getQuestByIdForMerchant(
+  questId: string,
+  merchantId: string
+): Promise<ServiceResult<QuestWithCampaign>> {
+  try {
+    const result = await sql`
+      SELECT bq.*, c.name as campaign_name
+      FROM branded_quests bq
+      JOIN campaigns c ON bq.campaign_id = c.id
+      WHERE bq.id = ${questId} AND c.merchant_id = ${merchantId}
+    `;
+
+    if (result.rows.length === 0) {
+      return failure('Quest not found', 'NOT_FOUND');
+    }
+
+    return success(result.rows[0] as QuestWithCampaign);
+  } catch (error) {
+    console.error('getQuestByIdForMerchant error:', error);
+    return failure('Failed to get quest', 'INTERNAL_ERROR');
+  }
+}
+
+export interface UpdateQuestInput {
+  name?: string;
+  description?: string;
+  instructions?: string;
+  coinReward?: number;
+  maxCompletions?: number;
+  isActive?: boolean;
+}
+
+export async function updateQuest(
+  questId: string,
+  merchantId: string,
+  data: UpdateQuestInput
+): Promise<ServiceResult<BrandedQuest>> {
+  try {
+    const existing = await sql`
+      SELECT bq.id FROM branded_quests bq
+      JOIN campaigns c ON bq.campaign_id = c.id
+      WHERE bq.id = ${questId} AND c.merchant_id = ${merchantId}
+    `;
+
+    if (existing.rows.length === 0) {
+      return failure('Quest not found', 'NOT_FOUND');
+    }
+
+    const result = await sql`
+      UPDATE branded_quests
+      SET
+        name = COALESCE(${data.name ?? null}, name),
+        description = COALESCE(${data.description ?? null}, description),
+        instructions = COALESCE(${data.instructions ?? null}, instructions),
+        coin_reward = COALESCE(${data.coinReward ?? null}, coin_reward),
+        max_completions = COALESCE(${data.maxCompletions ?? null}, max_completions),
+        is_active = COALESCE(${data.isActive ?? null}, is_active)
+      WHERE id = ${questId}
+      RETURNING *
+    `;
+
+    return success(result.rows[0] as BrandedQuest);
+  } catch (error) {
+    console.error('updateQuest error:', error);
+    return failure('Failed to update quest', 'INTERNAL_ERROR');
+  }
+}
+
+export async function deleteQuest(
+  questId: string,
+  merchantId: string
+): Promise<ServiceResult<{ success: boolean }>> {
+  try {
+    const result = await sql`
+      UPDATE branded_quests bq
+      SET is_active = false
+      FROM campaigns c
+      WHERE bq.id = ${questId}
+        AND bq.campaign_id = c.id
+        AND c.merchant_id = ${merchantId}
+      RETURNING bq.id
+    `;
+
+    if (result.rows.length === 0) {
+      return failure('Quest not found', 'NOT_FOUND');
+    }
+
+    return success({ success: true });
+  } catch (error) {
+    console.error('deleteQuest error:', error);
+    return failure('Failed to delete quest', 'INTERNAL_ERROR');
+  }
+}

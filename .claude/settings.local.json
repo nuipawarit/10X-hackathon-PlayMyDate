@@ -14,7 +14,8 @@
       "Bash(grep:*)",
       "Bash(pnpm build:*)",
       "Bash(xargs -I {} bash -c 'echo \"\"\"\"=== {} ===\"\"\"\" && head -30 \"\"\"\"{}\"\"\"\"')",
-      "Bash(wc:*)"
+      "Bash(wc:*)",
+      "Bash(npx shadcn@latest add:*)"
     ]
   }
 }

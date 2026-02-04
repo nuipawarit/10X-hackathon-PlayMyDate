@@ -293,3 +293,105 @@ export async function createVenue(
     return failure('Failed to create venue', 'INTERNAL_ERROR');
   }
 }
+
+export async function getVenueByIdForMerchant(
+  venueId: string,
+  merchantId: string
+): Promise<ServiceResult<DateVenue>> {
+  try {
+    const result = await sql`
+      SELECT * FROM date_venues WHERE id = ${venueId} AND merchant_id = ${merchantId}
+    `;
+
+    if (result.rows.length === 0) {
+      return failure('Venue not found', 'NOT_FOUND');
+    }
+
+    return success(result.rows[0] as DateVenue);
+  } catch (error) {
+    console.error('getVenueByIdForMerchant error:', error);
+    return failure('Failed to get venue', 'INTERNAL_ERROR');
+  }
+}
+
+export interface UpdateVenueInput {
+  name?: string;
+  venueType?: string;
+  description?: string;
+  address?: string;
+  locationLat?: string;
+  locationLng?: string;
+  priceRange?: number;
+  cuisineType?: string;
+  ambianceTags?: string[];
+  openingHours?: Record<string, { open: string; close: string }>;
+  bookingEnabled?: boolean;
+  photos?: string[];
+  rating?: string;
+  isActive?: boolean;
+}
+
+export async function updateVenue(
+  venueId: string,
+  merchantId: string,
+  data: UpdateVenueInput
+): Promise<ServiceResult<DateVenue>> {
+  try {
+    const existing = await sql`
+      SELECT id FROM date_venues WHERE id = ${venueId} AND merchant_id = ${merchantId}
+    `;
+
+    if (existing.rows.length === 0) {
+      return failure('Venue not found', 'NOT_FOUND');
+    }
+
+    const result = await sql`
+      UPDATE date_venues
+      SET
+        name = COALESCE(${data.name ?? null}, name),
+        venue_type = COALESCE(${data.venueType ?? null}, venue_type),
+        description = COALESCE(${data.description ?? null}, description),
+        address = COALESCE(${data.address ?? null}, address),
+        location_lat = COALESCE(${data.locationLat ?? null}, location_lat),
+        location_lng = COALESCE(${data.locationLng ?? null}, location_lng),
+        price_range = COALESCE(${data.priceRange ?? null}, price_range),
+        cuisine_type = COALESCE(${data.cuisineType ?? null}, cuisine_type),
+        ambiance_tags = COALESCE(${data.ambianceTags ? JSON.stringify(data.ambianceTags) : null}::jsonb, ambiance_tags),
+        opening_hours = COALESCE(${data.openingHours ? JSON.stringify(data.openingHours) : null}::jsonb, opening_hours),
+        booking_enabled = COALESCE(${data.bookingEnabled ?? null}, booking_enabled),
+        photos = COALESCE(${data.photos ? JSON.stringify(data.photos) : null}::jsonb, photos),
+        rating = COALESCE(${data.rating ?? null}, rating),
+        is_active = COALESCE(${data.isActive ?? null}, is_active)
+      WHERE id = ${venueId} AND merchant_id = ${merchantId}
+      RETURNING *
+    `;
+
+    return success(result.rows[0] as DateVenue);
+  } catch (error) {
+    console.error('updateVenue error:', error);
+    return failure('Failed to update venue', 'INTERNAL_ERROR');
+  }
+}
+
+export async function deleteVenue(
+  venueId: string,
+  merchantId: string
+): Promise<ServiceResult<{ success: boolean }>> {
+  try {
+    const result = await sql`
+      UPDATE date_venues
+      SET is_active = false
+      WHERE id = ${venueId} AND merchant_id = ${merchantId}
+      RETURNING id
+    `;
+
+    if (result.rows.length === 0) {
+      return failure('Venue not found', 'NOT_FOUND');
+    }
+
+    return success({ success: true });
+  } catch (error) {
+    console.error('deleteVenue error:', error);
+    return failure('Failed to delete venue', 'INTERNAL_ERROR');
+  }
+}

@@ -102,10 +102,10 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ id: s
           )}
         </div>
         <div className="flex gap-2">
-          <Button onClick={() => router.push(`/campaigns/${id}/performance`)}>
+          <Button onClick={() => router.push(`/b2b/campaigns/${id}/performance`)}>
             View Analytics
           </Button>
-          <Button variant="outline" onClick={() => router.push(`/campaigns/${id}/edit`)}>
+          <Button variant="outline" onClick={() => router.push(`/b2b/campaigns/${id}/edit`)}>
             Edit
           </Button>
           <Button variant="outline" onClick={() => router.back()}>

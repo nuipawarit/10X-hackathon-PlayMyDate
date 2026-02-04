@@ -45,7 +45,7 @@ export function CampaignEditor({ campaign, onSave }: CampaignEditorProps) {
 
       if (res.ok) {
         onSave?.(formData);
-        router.push('/campaigns');
+        router.push('/b2b/campaigns');
         router.refresh();
       }
     } finally {
@@ -95,7 +95,7 @@ export function CampaignEditor({ campaign, onSave }: CampaignEditorProps) {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label htmlFor="budget">Budget (฿)</Label>
               <Input
@@ -104,6 +104,7 @@ export function CampaignEditor({ campaign, onSave }: CampaignEditorProps) {
                 value={formData.budget || ''}
                 onChange={(e) => setFormData({ ...formData, budget: parseFloat(e.target.value) || undefined })}
               />
+              <p className="text-xs text-muted-foreground">Total campaign budget</p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="cpaRate">CPA Rate (฿)</Label>
@@ -113,6 +114,17 @@ export function CampaignEditor({ campaign, onSave }: CampaignEditorProps) {
                 value={formData.cpaRate || ''}
                 onChange={(e) => setFormData({ ...formData, cpaRate: parseFloat(e.target.value) || undefined })}
               />
+              <p className="text-xs text-muted-foreground">Cost per action</p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="cpmiRate">CPM Rate (฿)</Label>
+              <Input
+                id="cpmiRate"
+                type="number"
+                value={formData.cpmiRate || ''}
+                onChange={(e) => setFormData({ ...formData, cpmiRate: parseFloat(e.target.value) || undefined })}
+              />
+              <p className="text-xs text-muted-foreground">Cost per 1000 impressions</p>
             </div>
           </div>
 

@@ -88,6 +88,13 @@ export default function B2BLoginPage() {
             </Button>
           </form>
 
+          <p className="text-center text-sm text-muted-foreground mt-4">
+            Don&apos;t have an account?{' '}
+            <a href="/b2b/merchant-register" className="text-primary font-medium hover:underline">
+              Register your business
+            </a>
+          </p>
+
           <div className="mt-6 p-4 bg-muted rounded-lg">
             <p className="text-xs text-muted-foreground text-center mb-2">
               Demo Credentials
