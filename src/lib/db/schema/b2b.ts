@@ -1,4 +1,4 @@
-import { pgTable, uuid, varchar, text, integer, timestamp, jsonb, boolean, decimal, unique } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, varchar, text, integer, timestamp, jsonb, boolean, decimal, unique, index } from 'drizzle-orm/pg-core';
 import { users } from './users';
 import { matches } from './matches';
 import { activities } from './activities';
@@ -33,7 +33,9 @@ export const merchantUsers = pgTable('merchant_users', {
   isActive: boolean('is_active').default(true),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
-});
+}, (table) => [
+  index('merchant_users_merchant_id_idx').on(table.merchantId),
+]);
 
 export const merchantSessions = pgTable('merchant_sessions', {
   id: text('id').primaryKey(),
@@ -62,7 +64,11 @@ export const campaigns = pgTable('campaigns', {
   metrics: jsonb('metrics').$type<Record<string, unknown>>(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
-});
+}, (table) => [
+  index('campaigns_merchant_id_idx').on(table.merchantId),
+  index('campaigns_status_idx').on(table.status),
+  index('campaigns_dates_idx').on(table.startDate, table.endDate),
+]);
 
 export const brandedQuests = pgTable('branded_quests', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -81,7 +87,10 @@ export const brandedQuests = pgTable('branded_quests', {
   completionCount: integer('completion_count').default(0),
   isActive: boolean('is_active').default(true),
   createdAt: timestamp('created_at').defaultNow().notNull(),
-});
+}, (table) => [
+  index('branded_quests_campaign_id_idx').on(table.campaignId),
+  index('branded_quests_is_active_idx').on(table.isActive),
+]);
 
 export const questCompletions = pgTable(
   'quest_completions',

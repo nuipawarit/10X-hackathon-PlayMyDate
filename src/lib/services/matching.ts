@@ -1,6 +1,7 @@
 import { sql } from '@/lib/db';
 import type { User } from '@/lib/db';
 import { success, failure, type ServiceResult } from './types';
+import { getPersonaType, type PersonaType } from './behavioral';
 
 export interface MatchWithPartner {
   id: string;
@@ -30,6 +31,22 @@ export interface CreatedMatch {
   compatibility_score: number;
 }
 
+export interface MatchingOptions {
+  includeBehavioral?: boolean;
+  locationBased?: boolean;
+  maxDistance?: number;
+  premiumPriority?: boolean;
+  limit?: number;
+}
+
+const PERSONA_COMPATIBILITY: Record<PersonaType, PersonaType[]> = {
+  explorer: ['explorer', 'connector', 'achiever'],
+  connector: ['connector', 'explorer', 'casual'],
+  achiever: ['achiever', 'explorer', 'premium'],
+  premium: ['premium', 'achiever', 'connector'],
+  casual: ['casual', 'connector', 'explorer'],
+};
+
 export function calculateCompatibility(user1: User, user2: User): number {
   const style1 = new Set(user1.playing_style || []);
   const style2 = new Set(user2.playing_style || []);
@@ -41,6 +58,27 @@ export function calculateCompatibility(user1: User, user2: User): number {
 
   const totalScore = (styleScore * 0.4 + interestScore * 0.6) * 100;
   return Math.round(totalScore * 100) / 100;
+}
+
+export async function calculateAdvancedCompatibility(
+  user1: User,
+  user2: User,
+  user1Persona?: PersonaType,
+  user2Persona?: PersonaType
+): Promise<number> {
+  const baseScore = calculateCompatibility(user1, user2);
+
+  let personaBonus = 0;
+  if (user1Persona && user2Persona) {
+    const compatiblePersonas = PERSONA_COMPATIBILITY[user1Persona] || [];
+    if (compatiblePersonas.includes(user2Persona)) {
+      const index = compatiblePersonas.indexOf(user2Persona);
+      personaBonus = (3 - index) * 5;
+    }
+  }
+
+  const finalScore = Math.min(100, baseScore + personaBonus);
+  return Math.round(finalScore * 100) / 100;
 }
 
 export function jaccardSimilarity(set1: Set<string>, set2: Set<string>): number {
@@ -62,17 +100,31 @@ export function sanitizePartner(user: User): SanitizedPartner {
   };
 }
 
-export async function findMatches(userId: string): Promise<ServiceResult<CreatedMatch[]>> {
+export async function findMatches(
+  userId: string,
+  options: MatchingOptions = {}
+): Promise<ServiceResult<CreatedMatch[]>> {
   try {
+    const {
+      includeBehavioral = true,
+      premiumPriority = false,
+      limit = 20,
+    } = options;
+
     const currentUserResult = await sql`
-      SELECT * FROM users WHERE id = ${userId}
+      SELECT u.*, ubp.persona_type
+      FROM users u
+      LEFT JOIN user_behavioral_profiles ubp ON u.id = ubp.user_id
+      WHERE u.id = ${userId}
     `;
 
     if (currentUserResult.rows.length === 0) {
       return failure('Profile not found', 'NOT_FOUND');
     }
 
-    const currentUser = currentUserResult.rows[0] as User;
+    const currentUser = currentUserResult.rows[0] as User & { persona_type?: string };
+    const currentPersona = currentUser.persona_type as PersonaType | undefined;
+    const isPremium = currentUser.subscription_tier === 'premium' || currentUser.subscription_tier === 'plus';
 
     const existingMatchesResult = await sql`
       SELECT user1_id, user2_id FROM matches
@@ -87,49 +139,87 @@ export async function findMatches(userId: string): Promise<ServiceResult<Created
     });
 
     const matchedIdsArray = Array.from(matchedUserIds);
+    const effectiveLimit = isPremium || premiumPriority ? limit * 2 : limit;
 
-    const potentialMatchesResult = await sql`
-      SELECT * FROM users
-      WHERE id != ALL(${matchedIdsArray as unknown as string}::uuid[])
-      LIMIT 20
-    `;
+    let potentialMatchesResult;
+    if (premiumPriority && isPremium) {
+      potentialMatchesResult = await sql`
+        SELECT u.*, ubp.persona_type
+        FROM users u
+        LEFT JOIN user_behavioral_profiles ubp ON u.id = ubp.user_id
+        WHERE u.id != ALL(${matchedIdsArray as unknown as string}::uuid[])
+        ORDER BY
+          CASE WHEN u.subscription_tier IN ('premium', 'plus') THEN 0 ELSE 1 END,
+          u.created_at DESC
+        LIMIT ${effectiveLimit}
+      `;
+    } else {
+      potentialMatchesResult = await sql`
+        SELECT u.*, ubp.persona_type
+        FROM users u
+        LEFT JOIN user_behavioral_profiles ubp ON u.id = ubp.user_id
+        WHERE u.id != ALL(${matchedIdsArray as unknown as string}::uuid[])
+        ORDER BY u.created_at DESC
+        LIMIT ${effectiveLimit}
+      `;
+    }
 
     if (potentialMatchesResult.rows.length === 0) {
       return success([]);
     }
 
     const createdMatches: CreatedMatch[] = [];
+    const scoredCandidates: Array<{ candidate: User & { persona_type?: string }; score: number }> = [];
 
-    for (const candidate of potentialMatchesResult.rows as User[]) {
-      const score = calculateCompatibility(currentUser, candidate);
+    for (const candidate of potentialMatchesResult.rows as (User & { persona_type?: string })[]) {
+      let score: number;
+
+      if (includeBehavioral && currentPersona) {
+        score = await calculateAdvancedCompatibility(
+          currentUser,
+          candidate,
+          currentPersona,
+          candidate.persona_type as PersonaType | undefined
+        );
+      } else {
+        score = calculateCompatibility(currentUser, candidate);
+      }
 
       if (score >= 30) {
-        const [user1_id, user2_id] =
-          currentUser.id < candidate.id
-            ? [currentUser.id, candidate.id]
-            : [candidate.id, currentUser.id];
+        scoredCandidates.push({ candidate, score });
+      }
+    }
 
-        const matchResult = await sql`
-          INSERT INTO matches (user1_id, user2_id, compatibility_score, status)
-          VALUES (${user1_id}, ${user2_id}, ${score}, 'matched')
-          ON CONFLICT (user1_id, user2_id) DO NOTHING
-          RETURNING *
-        `;
+    scoredCandidates.sort((a, b) => b.score - a.score);
 
-        if (matchResult.rows.length > 0) {
-          const match = matchResult.rows[0] as {
-            id: string;
-            user1_id: string;
-            user2_id: string;
-            compatibility_score: number;
-            status: string;
-          };
-          createdMatches.push({
-            match,
-            partner: sanitizePartner(candidate),
-            compatibility_score: score,
-          });
-        }
+    const topCandidates = scoredCandidates.slice(0, limit);
+
+    for (const { candidate, score } of topCandidates) {
+      const [user1_id, user2_id] =
+        currentUser.id < candidate.id
+          ? [currentUser.id, candidate.id]
+          : [candidate.id, currentUser.id];
+
+      const matchResult = await sql`
+        INSERT INTO matches (user1_id, user2_id, compatibility_score, status)
+        VALUES (${user1_id}, ${user2_id}, ${score}, 'matched')
+        ON CONFLICT (user1_id, user2_id) DO NOTHING
+        RETURNING *
+      `;
+
+      if (matchResult.rows.length > 0) {
+        const match = matchResult.rows[0] as {
+          id: string;
+          user1_id: string;
+          user2_id: string;
+          compatibility_score: number;
+          status: string;
+        };
+        createdMatches.push({
+          match,
+          partner: sanitizePartner(candidate),
+          compatibility_score: score,
+        });
       }
     }
 

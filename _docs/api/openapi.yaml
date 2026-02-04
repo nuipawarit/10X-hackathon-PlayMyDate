@@ -1,0 +1,1338 @@
+openapi: 3.0.3
+info:
+  title: PlayMyDate API
+  description: |
+    PlayMyDate v2 API documentation for B2C and B2B features.
+
+    ## Authentication
+    - **B2C**: Session-based authentication via Lucia
+    - **B2B**: Session-based authentication with merchant credentials
+
+    ## Rate Limiting
+    - Standard: 100 requests/minute
+    - Premium: 500 requests/minute
+  version: 2.0.0
+  contact:
+    name: PlayMyDate Support
+
+servers:
+  - url: /api
+    description: API server
+
+tags:
+  - name: Auth
+    description: User authentication
+  - name: Users
+    description: User profile management
+  - name: Matches
+    description: Matching system
+  - name: Activities
+    description: Activities and missions
+  - name: Messages
+    description: Chat messaging
+  - name: PlayCoin
+    description: Virtual currency system
+  - name: Dates
+    description: Paradise Mode - venue and booking
+  - name: Subscription
+    description: Subscription management
+  - name: B2B Auth
+    description: Merchant authentication
+  - name: B2B Merchant
+    description: Merchant profile
+  - name: B2B Campaigns
+    description: Campaign management
+  - name: B2B Analytics
+    description: Analytics and reporting
+  - name: B2B Billing
+    description: Billing management
+
+paths:
+  # B2C Auth
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: User login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+
+  /auth/logout:
+    post:
+      tags: [Auth]
+      summary: User logout
+      responses:
+        '200':
+          description: Logout successful
+
+  /auth/session:
+    get:
+      tags: [Auth]
+      summary: Get current session
+      responses:
+        '200':
+          description: Session data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+
+  # PlayCoin
+  /playcoin/wallet:
+    get:
+      tags: [PlayCoin]
+      summary: Get wallet balance
+      security:
+        - sessionAuth: []
+      responses:
+        '200':
+          description: Wallet information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletResponse'
+
+  /playcoin/transactions:
+    get:
+      tags: [PlayCoin]
+      summary: Get transaction history
+      security:
+        - sessionAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: Transaction list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionsResponse'
+
+  /playcoin/checkin:
+    post:
+      tags: [PlayCoin]
+      summary: Perform daily check-in
+      security:
+        - sessionAuth: []
+      responses:
+        '200':
+          description: Check-in result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckinResponse'
+
+  /playcoin/rewards:
+    get:
+      tags: [PlayCoin]
+      summary: Get reward catalog
+      security:
+        - sessionAuth: []
+      parameters:
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [powerup, avatar_item, voucher, partner_exchange]
+      responses:
+        '200':
+          description: Reward catalog
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RewardsResponse'
+
+  /playcoin/redeem:
+    post:
+      tags: [PlayCoin]
+      summary: Redeem a reward
+      security:
+        - sessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [rewardId]
+              properties:
+                rewardId:
+                  type: string
+                  format: uuid
+      responses:
+        '200':
+          description: Redemption result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RedeemResponse'
+
+  /playcoin/exchange:
+    post:
+      tags: [PlayCoin]
+      summary: Exchange coins with partner
+      security:
+        - sessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [partnerId, amount]
+              properties:
+                partnerId:
+                  type: string
+                amount:
+                  type: integer
+                  minimum: 1
+      responses:
+        '200':
+          description: Exchange result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExchangeResponse'
+
+  # Dates/Paradise Mode
+  /dates/venues:
+    get:
+      tags: [Dates]
+      summary: Search venues
+      security:
+        - sessionAuth: []
+      parameters:
+        - name: venueType
+          in: query
+          schema:
+            type: string
+        - name: priceRange
+          in: query
+          schema:
+            type: integer
+        - name: cuisineType
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: Venue list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VenuesResponse'
+
+  /dates/venues/{id}:
+    get:
+      tags: [Dates]
+      summary: Get venue details
+      security:
+        - sessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Venue details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VenueResponse'
+
+  /dates/bookings:
+    get:
+      tags: [Dates]
+      summary: List user bookings
+      security:
+        - sessionAuth: []
+      responses:
+        '200':
+          description: Booking list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingsResponse'
+    post:
+      tags: [Dates]
+      summary: Create booking
+      security:
+        - sessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBookingRequest'
+      responses:
+        '201':
+          description: Booking created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingResponse'
+
+  /dates/checkin:
+    post:
+      tags: [Dates]
+      summary: QR check-in at venue
+      security:
+        - sessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [qrCode]
+              properties:
+                qrCode:
+                  type: string
+      responses:
+        '200':
+          description: Check-in result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QRCheckinResponse'
+
+  # Subscription
+  /subscription:
+    get:
+      tags: [Subscription]
+      summary: Get current subscription
+      security:
+        - sessionAuth: []
+      responses:
+        '200':
+          description: Subscription data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionResponse'
+
+  /subscription/upgrade:
+    post:
+      tags: [Subscription]
+      summary: Upgrade subscription tier
+      security:
+        - sessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [tier]
+              properties:
+                tier:
+                  type: string
+                  enum: [plus, premium]
+      responses:
+        '200':
+          description: Upgrade result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionResponse'
+
+  /subscription/cancel:
+    post:
+      tags: [Subscription]
+      summary: Cancel subscription
+      security:
+        - sessionAuth: []
+      responses:
+        '200':
+          description: Cancellation result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionResponse'
+
+  # B2B Auth
+  /b2b/auth/login:
+    post:
+      tags: [B2B Auth]
+      summary: Merchant login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/B2BAuthResponse'
+
+  /b2b/auth/logout:
+    post:
+      tags: [B2B Auth]
+      summary: Merchant logout
+      responses:
+        '200':
+          description: Logout successful
+
+  /b2b/auth/session:
+    get:
+      tags: [B2B Auth]
+      summary: Get merchant session
+      responses:
+        '200':
+          description: Session data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/B2BSessionResponse'
+
+  # B2B Merchant
+  /b2b/merchant:
+    get:
+      tags: [B2B Merchant]
+      summary: Get merchant profile
+      security:
+        - b2bSessionAuth: []
+      responses:
+        '200':
+          description: Merchant data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantResponse'
+    put:
+      tags: [B2B Merchant]
+      summary: Update merchant profile
+      security:
+        - b2bSessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMerchantRequest'
+      responses:
+        '200':
+          description: Update successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantResponse'
+
+  # B2B Campaigns
+  /b2b/campaigns:
+    get:
+      tags: [B2B Campaigns]
+      summary: List campaigns
+      security:
+        - b2bSessionAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [draft, active, paused, completed]
+      responses:
+        '200':
+          description: Campaign list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignsResponse'
+    post:
+      tags: [B2B Campaigns]
+      summary: Create campaign
+      security:
+        - b2bSessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCampaignRequest'
+      responses:
+        '201':
+          description: Campaign created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignResponse'
+
+  /b2b/campaigns/{id}:
+    get:
+      tags: [B2B Campaigns]
+      summary: Get campaign details
+      security:
+        - b2bSessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Campaign data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignResponse'
+    put:
+      tags: [B2B Campaigns]
+      summary: Update campaign
+      security:
+        - b2bSessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCampaignRequest'
+      responses:
+        '200':
+          description: Campaign updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignResponse'
+
+  # B2B Analytics
+  /b2b/analytics/overview:
+    get:
+      tags: [B2B Analytics]
+      summary: Get analytics overview
+      security:
+        - b2bSessionAuth: []
+      parameters:
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [7d, 30d, 90d, all]
+            default: 30d
+      responses:
+        '200':
+          description: Analytics overview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsOverviewResponse'
+
+  /b2b/analytics/conversions:
+    get:
+      tags: [B2B Analytics]
+      summary: Get conversion funnel
+      security:
+        - b2bSessionAuth: []
+      parameters:
+        - name: campaignId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Conversion data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversionFunnelResponse'
+
+  /b2b/analytics/audience:
+    get:
+      tags: [B2B Analytics]
+      summary: Get audience insights
+      security:
+        - b2bSessionAuth: []
+      responses:
+        '200':
+          description: Audience data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AudienceInsightsResponse'
+
+  /b2b/analytics/reports:
+    post:
+      tags: [B2B Analytics]
+      summary: Generate report
+      security:
+        - b2bSessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateReportRequest'
+      responses:
+        '201':
+          description: Report generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportResponse'
+
+  /b2b/analytics/reports/{id}:
+    get:
+      tags: [B2B Analytics]
+      summary: Get report by ID
+      security:
+        - b2bSessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Report data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportResponse'
+
+  # B2B Billing
+  /b2b/billing/invoices:
+    get:
+      tags: [B2B Billing]
+      summary: List invoices
+      security:
+        - b2bSessionAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, paid, overdue]
+      responses:
+        '200':
+          description: Invoice list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoicesResponse'
+
+  /b2b/billing/usage:
+    get:
+      tags: [B2B Billing]
+      summary: Get usage data
+      security:
+        - b2bSessionAuth: []
+      parameters:
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [7d, 30d, 90d]
+            default: 30d
+      responses:
+        '200':
+          description: Usage data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsageResponse'
+
+components:
+  securitySchemes:
+    sessionAuth:
+      type: apiKey
+      in: cookie
+      name: auth_session
+    b2bSessionAuth:
+      type: apiKey
+      in: cookie
+      name: b2b_session
+
+  schemas:
+    ServiceResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+        error:
+          type: string
+        code:
+          type: string
+
+    AuthResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            user:
+              $ref: '#/components/schemas/User'
+
+    SessionResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            user:
+              $ref: '#/components/schemas/User'
+            session:
+              type: object
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        display_name:
+          type: string
+        subscription_tier:
+          type: string
+          enum: [free, plus, premium]
+
+    WalletResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            balance:
+              type: integer
+            lifetime_earned:
+              type: integer
+            lifetime_spent:
+              type: integer
+
+    TransactionsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            transactions:
+              type: array
+              items:
+                $ref: '#/components/schemas/Transaction'
+            total:
+              type: integer
+
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [earn, burn, purchase, exchange]
+        amount:
+          type: integer
+        balance_after:
+          type: integer
+        source:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    CheckinResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            coinsEarned:
+              type: integer
+            streakCount:
+              type: integer
+            newBalance:
+              type: integer
+
+    RewardsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Reward'
+
+    Reward:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+        coin_cost:
+          type: integer
+        is_active:
+          type: boolean
+
+    RedeemResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            userReward:
+              type: object
+            newBalance:
+              type: integer
+
+    ExchangeResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            transactionId:
+              type: string
+            partnerId:
+              type: string
+            partnerName:
+              type: string
+            coinsSpent:
+              type: integer
+            rewardValue:
+              type: integer
+            code:
+              type: string
+
+    VenuesResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            venues:
+              type: array
+              items:
+                $ref: '#/components/schemas/Venue'
+            total:
+              type: integer
+
+    VenueResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: '#/components/schemas/Venue'
+
+    Venue:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        venue_type:
+          type: string
+        description:
+          type: string
+        address:
+          type: string
+        price_range:
+          type: integer
+        cuisine_type:
+          type: string
+        rating:
+          type: number
+        booking_enabled:
+          type: boolean
+
+    BookingsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Booking'
+
+    BookingResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: '#/components/schemas/Booking'
+
+    Booking:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        venue_id:
+          type: string
+          format: uuid
+        match_id:
+          type: string
+          format: uuid
+        booking_date:
+          type: string
+          format: date
+        booking_time:
+          type: string
+        party_size:
+          type: integer
+        status:
+          type: string
+        confirmation_code:
+          type: string
+
+    CreateBookingRequest:
+      type: object
+      required: [venueId, matchId, bookingDate, bookingTime, partySize]
+      properties:
+        venueId:
+          type: string
+          format: uuid
+        matchId:
+          type: string
+          format: uuid
+        bookingDate:
+          type: string
+          format: date
+        bookingTime:
+          type: string
+        partySize:
+          type: integer
+        specialRequests:
+          type: string
+
+    QRCheckinResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            coinsEarned:
+              type: integer
+            venue:
+              $ref: '#/components/schemas/Venue'
+
+    SubscriptionResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            userId:
+              type: string
+              format: uuid
+            tier:
+              type: string
+              enum: [free, plus, premium]
+            status:
+              type: string
+            currentPeriodEnd:
+              type: string
+              format: date-time
+
+    B2BAuthResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            user:
+              $ref: '#/components/schemas/MerchantUser'
+
+    B2BSessionResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            user:
+              $ref: '#/components/schemas/MerchantUser'
+
+    MerchantUser:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        merchantId:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        displayName:
+          type: string
+        role:
+          type: string
+
+    MerchantResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: '#/components/schemas/Merchant'
+
+    Merchant:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        business_type:
+          type: string
+        description:
+          type: string
+        contact_email:
+          type: string
+        status:
+          type: string
+        tier:
+          type: string
+
+    UpdateMerchantRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        contactPhone:
+          type: string
+        address:
+          type: string
+        logoUrl:
+          type: string
+
+    CampaignsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Campaign'
+
+    CampaignResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: '#/components/schemas/Campaign'
+
+    Campaign:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        type:
+          type: string
+        description:
+          type: string
+        budget:
+          type: number
+        spent:
+          type: number
+        status:
+          type: string
+        start_date:
+          type: string
+          format: date-time
+        end_date:
+          type: string
+          format: date-time
+        metrics:
+          type: object
+
+    CreateCampaignRequest:
+      type: object
+      required: [name, type]
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+          enum: [brand_awareness, engagement, conversion]
+        description:
+          type: string
+        budget:
+          type: number
+        cpaRate:
+          type: number
+        cpmiRate:
+          type: number
+        targetAudience:
+          type: object
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+
+    UpdateCampaignRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        budget:
+          type: number
+        status:
+          type: string
+        targetAudience:
+          type: object
+
+    AnalyticsOverviewResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            totalCampaigns:
+              type: integer
+            activeCampaigns:
+              type: integer
+            totalImpressions:
+              type: integer
+            totalClicks:
+              type: integer
+            totalConversions:
+              type: integer
+            totalSpent:
+              type: number
+            avgCTR:
+              type: number
+            avgConversionRate:
+              type: number
+
+    ConversionFunnelResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            impressions:
+              type: integer
+            clicks:
+              type: integer
+            engagements:
+              type: integer
+            conversions:
+              type: integer
+            dropoffRates:
+              type: object
+
+    AudienceInsightsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              segment:
+                type: string
+              count:
+                type: integer
+              percentage:
+                type: number
+              avgEngagement:
+                type: number
+
+    GenerateReportRequest:
+      type: object
+      required: [type]
+      properties:
+        type:
+          type: string
+          enum: [overview, audience, campaigns]
+        period:
+          type: string
+          enum: [7d, 30d, 90d, all]
+        campaignIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+
+    ReportResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            reportType:
+              type: string
+            status:
+              type: string
+            data:
+              type: object
+            generatedAt:
+              type: string
+              format: date-time
+
+    InvoicesResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Invoice'
+
+    Invoice:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        invoiceNumber:
+          type: string
+        amount:
+          type: number
+        status:
+          type: string
+        dueDate:
+          type: string
+          format: date
+        paidAt:
+          type: string
+          format: date-time
+
+    UsageResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            totalImpressions:
+              type: integer
+            totalClicks:
+              type: integer
+            totalConversions:
+              type: integer
+            totalSpend:
+              type: number
+            dailyUsage:
+              type: array
+              items:
+                type: object

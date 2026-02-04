@@ -19,19 +19,19 @@ export async function GET(request: NextRequest) {
       return response;
     }
 
+    const typedUser = user as unknown as { id: string; merchantId: string; email: string; displayName: string | null; role: string };
     const merchantResult = await sql`
-      SELECT name, status, tier FROM merchants WHERE id = ${user.merchantId}
+      SELECT name, status, tier FROM merchants WHERE id = ${typedUser.merchantId}
     `;
 
     const merchant = merchantResult.rows[0] || null;
-
     const response = NextResponse.json({
       user: {
-        id: user.id,
-        merchantId: user.merchantId,
-        email: user.email,
-        displayName: user.displayName,
-        role: user.role,
+        id: typedUser.id,
+        merchantId: typedUser.merchantId,
+        email: typedUser.email,
+        displayName: typedUser.displayName,
+        role: typedUser.role,
       },
       merchant: merchant ? {
         name: merchant.name,

@@ -107,16 +107,40 @@ export async function getVenueById(venueId: string): Promise<ServiceResult<DateV
   }
 }
 
+export interface RecommendationFactors {
+  matchId: string;
+  preferredPriceRange?: number;
+  preferredVenueTypes?: string[];
+  preferredAmbiance?: string[];
+}
+
+const PERSONA_VENUE_PREFERENCES: Record<string, { venueTypes: string[]; ambiance: string[]; priceRange: number }> = {
+  explorer: { venueTypes: ['activity', 'outdoor', 'unique'], ambiance: ['adventurous', 'exciting'], priceRange: 3 },
+  connector: { venueTypes: ['cafe', 'restaurant', 'bar'], ambiance: ['cozy', 'intimate', 'romantic'], priceRange: 2 },
+  achiever: { venueTypes: ['fine_dining', 'rooftop', 'exclusive'], ambiance: ['upscale', 'trendy'], priceRange: 4 },
+  premium: { venueTypes: ['fine_dining', 'exclusive', 'spa'], ambiance: ['luxury', 'exclusive'], priceRange: 5 },
+  casual: { venueTypes: ['cafe', 'casual_dining', 'park'], ambiance: ['relaxed', 'casual'], priceRange: 2 },
+};
+
 export async function getRecommendationsForMatch(
   matchId: string,
   limit: number = 5
 ): Promise<ServiceResult<DateVenue[]>> {
   try {
     const matchResult = await sql`
-      SELECT m.*, u1.interests as user1_interests, u2.interests as user2_interests
+      SELECT
+        m.*,
+        u1.interests as user1_interests,
+        u2.interests as user2_interests,
+        ubp1.persona_type as user1_persona,
+        ubp2.persona_type as user2_persona,
+        ubp1.preferences as user1_preferences,
+        ubp2.preferences as user2_preferences
       FROM matches m
       JOIN users u1 ON m.user1_id = u1.id
       JOIN users u2 ON m.user2_id = u2.id
+      LEFT JOIN user_behavioral_profiles ubp1 ON u1.id = ubp1.user_id
+      LEFT JOIN user_behavioral_profiles ubp2 ON u2.id = ubp2.user_id
       WHERE m.id = ${matchId}
     `;
 
@@ -124,10 +148,31 @@ export async function getRecommendationsForMatch(
       return failure('Match not found', 'NOT_FOUND');
     }
 
+    const match = matchResult.rows[0];
+    const user1Persona = match.user1_persona || 'casual';
+    const user2Persona = match.user2_persona || 'casual';
+
+    const prefs1 = PERSONA_VENUE_PREFERENCES[user1Persona] || PERSONA_VENUE_PREFERENCES.casual;
+    const prefs2 = PERSONA_VENUE_PREFERENCES[user2Persona] || PERSONA_VENUE_PREFERENCES.casual;
+
+    const combinedVenueTypes = [...new Set([...prefs1.venueTypes, ...prefs2.venueTypes])];
+    const combinedAmbiance = [...new Set([...prefs1.ambiance, ...prefs2.ambiance])];
+    const avgPriceRange = Math.ceil((prefs1.priceRange + prefs2.priceRange) / 2);
+
     const result = await sql`
-      SELECT * FROM date_venues
+      SELECT *,
+        CASE
+          WHEN venue_type = ANY(${combinedVenueTypes as unknown as string}::text[]) THEN 20
+          ELSE 0
+        END +
+        CASE
+          WHEN price_range <= ${avgPriceRange} THEN 10
+          ELSE 0
+        END +
+        COALESCE((rating::numeric * 10), 0) as recommendation_score
+      FROM date_venues
       WHERE is_active = true AND booking_enabled = true
-      ORDER BY rating DESC NULLS LAST, RANDOM()
+      ORDER BY recommendation_score DESC, rating DESC NULLS LAST, RANDOM()
       LIMIT ${limit}
     `;
 
@@ -135,6 +180,75 @@ export async function getRecommendationsForMatch(
   } catch (error) {
     console.error('getRecommendationsForMatch error:', error);
     return failure('Failed to get recommendations', 'INTERNAL_ERROR');
+  }
+}
+
+export async function getSmartVenueRecommendations(
+  userId: string,
+  options: { matchId?: string; limit?: number } = {}
+): Promise<ServiceResult<{ venues: DateVenue[]; reasons: Record<string, string> }>> {
+  try {
+    const { matchId, limit = 5 } = options;
+
+    const userResult = await sql`
+      SELECT u.*, ubp.persona_type, ubp.preferences
+      FROM users u
+      LEFT JOIN user_behavioral_profiles ubp ON u.id = ubp.user_id
+      WHERE u.id = ${userId}
+    `;
+
+    if (userResult.rows.length === 0) {
+      return failure('User not found', 'NOT_FOUND');
+    }
+
+    const user = userResult.rows[0];
+    const persona = user.persona_type || 'casual';
+    const prefs = PERSONA_VENUE_PREFERENCES[persona] || PERSONA_VENUE_PREFERENCES.casual;
+
+    let partnerPersona = 'casual';
+    if (matchId) {
+      const matchResult = await sql`
+        SELECT
+          CASE WHEN m.user1_id = ${userId} THEN ubp2.persona_type ELSE ubp1.persona_type END as partner_persona
+        FROM matches m
+        LEFT JOIN user_behavioral_profiles ubp1 ON m.user1_id = ubp1.user_id
+        LEFT JOIN user_behavioral_profiles ubp2 ON m.user2_id = ubp2.user_id
+        WHERE m.id = ${matchId}
+      `;
+      if (matchResult.rows.length > 0 && matchResult.rows[0].partner_persona) {
+        partnerPersona = matchResult.rows[0].partner_persona;
+      }
+    }
+
+    const partnerPrefs = PERSONA_VENUE_PREFERENCES[partnerPersona] || PERSONA_VENUE_PREFERENCES.casual;
+    const combinedTypes = [...new Set([...prefs.venueTypes, ...partnerPrefs.venueTypes])];
+
+    const venues = await sql`
+      SELECT * FROM date_venues
+      WHERE is_active = true
+        AND booking_enabled = true
+        AND (venue_type = ANY(${combinedTypes as unknown as string}::text[]) OR rating::numeric >= 4)
+      ORDER BY rating DESC NULLS LAST
+      LIMIT ${limit}
+    `;
+
+    const reasons: Record<string, string> = {};
+    for (const venue of venues.rows as DateVenue[]) {
+      if (prefs.venueTypes.includes(venue.venue_type)) {
+        reasons[venue.id] = `Matches your ${persona} style`;
+      } else if (partnerPrefs.venueTypes.includes(venue.venue_type)) {
+        reasons[venue.id] = `Your match might enjoy this`;
+      } else if (parseFloat(venue.rating || '0') >= 4) {
+        reasons[venue.id] = `Highly rated venue`;
+      } else {
+        reasons[venue.id] = `Popular choice`;
+      }
+    }
+
+    return success({ venues: venues.rows as DateVenue[], reasons });
+  } catch (error) {
+    console.error('getSmartVenueRecommendations error:', error);
+    return failure('Failed to get smart recommendations', 'INTERNAL_ERROR');
   }
 }
 

@@ -21,7 +21,8 @@ export async function withB2BAuth(
     return response;
   }
 
-  const result = await handler(user.merchantId, user.id, session.id);
+  const typedUser = user as unknown as { id: string; merchantId: string };
+  const result = await handler(typedUser.merchantId, typedUser.id, session.id);
 
   if (session.fresh) {
     const sessionCookie = luciaB2B.createSessionCookie(session.id);
@@ -78,5 +79,6 @@ export async function getB2BAuthUser(
     return null;
   }
 
-  return { merchantId: user.merchantId, userId: user.id, sessionId: session.id };
+  const typedUser = user as unknown as { id: string; merchantId: string };
+  return { merchantId: typedUser.merchantId, userId: typedUser.id, sessionId: session.id };
 }

@@ -13,6 +13,13 @@ const adapter = new NodePostgresAdapter(pool, {
   session: 'merchant_sessions',
 });
 
+interface B2BDatabaseUserAttributes {
+  email: string;
+  display_name: string | null;
+  merchant_id: string;
+  role: string;
+}
+
 export const luciaB2B = new Lucia(adapter, {
   sessionCookie: {
     name: 'b2b_session',
@@ -21,28 +28,15 @@ export const luciaB2B = new Lucia(adapter, {
     },
   },
   getUserAttributes: (attributes) => {
+    const attrs = attributes as unknown as B2BDatabaseUserAttributes;
     return {
-      email: attributes.email,
-      displayName: attributes.display_name,
-      merchantId: attributes.merchant_id,
-      role: attributes.role,
+      email: attrs.email,
+      displayName: attrs.display_name,
+      merchantId: attrs.merchant_id,
+      role: attrs.role,
     };
   },
 });
-
-declare module 'lucia' {
-  interface Register {
-    Lucia: typeof luciaB2B;
-    DatabaseUserAttributes: B2BDatabaseUserAttributes;
-  }
-}
-
-interface B2BDatabaseUserAttributes {
-  email: string;
-  display_name: string | null;
-  merchant_id: string;
-  role: string;
-}
 
 export { hashPassword, verifyPassword } from './auth';
 

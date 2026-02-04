@@ -7,3 +7,4 @@ export * from './typing';
 export * from './playcoin';
 export * from './dates';
 export * from './b2b';
+export * from './analytics';

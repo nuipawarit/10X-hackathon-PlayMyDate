@@ -472,103 +472,103 @@
 
 ### 3.1 Analytics Domain - Tables
 
-- [ ] Create `user_behavioral_profiles` table
-- [ ] Create `aggregated_insights` table
-- [ ] Create `campaign_events` table
-- [ ] Create `unlock_history` table
-- [ ] Create Drizzle schema: `/src/lib/db/schema/analytics.ts`
+- [x] Create `user_behavioral_profiles` table
+- [x] Create `aggregated_insights` table
+- [x] Create `campaign_events` table
+- [x] Create `unlock_history` table
+- [x] Create Drizzle schema: `/src/lib/db/schema/analytics.ts`
 
 ### 3.2 Analytics Services
 
-- [ ] Create `/src/lib/services/analytics.ts`
-  - [ ] `getMerchantOverview(merchantId, period)`
-  - [ ] `getCampaignPerformance(campaignId)`
-  - [ ] `getConversionFunnel(campaignId)`
-  - [ ] `getAudienceInsights(merchantId, filters)`
-  - [ ] `generateReport(merchantId, config)`
-- [ ] Create `/src/lib/services/behavioral.ts`
-  - [ ] `analyzeUserBehavior(userId)`
-  - [ ] `updateBehavioralProfile(userId)`
-  - [ ] `getPersonaType(userId)`
-- [ ] Create `/src/lib/services/tracking.ts`
-  - [ ] `trackCampaignEvent(campaignId, event)`
-  - [ ] `trackUserAction(userId, action)`
+- [x] Create `/src/lib/services/analytics.ts`
+  - [x] `getMerchantOverview(merchantId, period)`
+  - [x] `getCampaignPerformance(campaignId)`
+  - [x] `getConversionFunnel(campaignId)`
+  - [x] `getAudienceInsights(merchantId, filters)`
+  - [x] `generateReport(merchantId, config)`
+- [x] Create `/src/lib/services/behavioral.ts`
+  - [x] `analyzeUserBehavior(userId)`
+  - [x] `updateBehavioralProfile(userId)`
+  - [x] `getPersonaType(userId)`
+- [x] Create `/src/lib/services/tracking.ts`
+  - [x] `trackCampaignEvent(campaignId, event)`
+  - [x] `trackUserAction(userId, action)`
 
 ### 3.3 Full B2B API Routes
 
-- [ ] Create `GET /api/b2b/analytics/overview/route.ts`
-- [ ] Create `GET /api/b2b/analytics/conversions/route.ts`
-- [ ] Create `GET /api/b2b/analytics/audience/route.ts`
-- [ ] Create `GET /api/b2b/analytics/campaigns/[id]/route.ts`
-- [ ] Create `POST /api/b2b/analytics/reports/route.ts`
-- [ ] Create `GET /api/b2b/analytics/reports/[id]/route.ts`
-- [ ] Create `GET /api/b2b/billing/invoices/route.ts`
-- [ ] Create `GET /api/b2b/billing/usage/route.ts`
-- [ ] Create `GET /api/b2b/bookings/route.ts`
-- [ ] Create `PUT /api/b2b/bookings/[id]/route.ts`
+- [x] Create `GET /api/b2b/analytics/overview/route.ts`
+- [x] Create `GET /api/b2b/analytics/conversions/route.ts`
+- [x] Create `GET /api/b2b/analytics/audience/route.ts`
+- [x] Create `GET /api/b2b/analytics/campaigns/[id]/route.ts`
+- [x] Create `POST /api/b2b/analytics/reports/route.ts`
+- [x] Create `GET /api/b2b/analytics/reports/[id]/route.ts`
+- [x] Create `GET /api/b2b/billing/invoices/route.ts`
+- [x] Create `GET /api/b2b/billing/usage/route.ts`
+- [x] Create `GET /api/b2b/bookings/route.ts`
+- [x] Create `PUT /api/b2b/bookings/[id]/route.ts`
 
 ### 3.4 Partner Exchange
 
-- [ ] Create `/src/lib/services/exchange.ts`
-  - [ ] `getExchangePartners()`
-  - [ ] `calculateExchangeRate(partnerId, amount)`
-  - [ ] `executeExchange(userId, partnerId, amount)`
-- [ ] Create `POST /api/playcoin/exchange/route.ts`
+- [x] Create `/src/lib/services/exchange.ts`
+  - [x] `getExchangePartners()`
+  - [x] `calculateExchangeRate(partnerId, amount)`
+  - [x] `executeExchange(userId, partnerId, amount)`
+- [x] Create `POST /api/playcoin/exchange/route.ts`
 
 ### 3.5 Subscription System
 
 - [ ] Configure Stripe products and prices
-- [ ] Create `/src/lib/services/subscription.ts`
-  - [ ] `getCurrentSubscription(userId)`
-  - [ ] `upgradeTier(userId, tier)`
-  - [ ] `cancelSubscription(userId)`
-  - [ ] `handleWebhook(event)`
-- [ ] Create `GET /api/subscription/route.ts`
-- [ ] Create `POST /api/subscription/upgrade/route.ts`
-- [ ] Create `POST /api/subscription/cancel/route.ts`
-- [ ] Create `POST /api/webhooks/payment/route.ts`
+- [x] Create `/src/lib/services/subscription.ts`
+  - [x] `getCurrentSubscription(userId)`
+  - [x] `upgradeTier(userId, tier)`
+  - [x] `cancelSubscription(userId)`
+  - [x] `handleWebhook(event)`
+- [x] Create `GET /api/subscription/route.ts`
+- [x] Create `POST /api/subscription/upgrade/route.ts`
+- [x] Create `POST /api/subscription/cancel/route.ts`
+- [x] Create `POST /api/webhooks/payment/route.ts`
 
 ### 3.6 Full B2B Portal UI
 
 #### Components
 
-- [ ] Create `/src/components/b2b/CampaignEditor.tsx`
-- [ ] Create `/src/components/b2b/QuestBuilder.tsx`
-- [ ] Create `/src/components/b2b/AnalyticsDashboard.tsx`
-- [ ] Create `/src/components/b2b/ConversionFunnel.tsx`
-- [ ] Create `/src/components/b2b/AudienceInsights.tsx`
-- [ ] Create `/src/components/b2b/ReportBuilder.tsx`
-- [ ] Create `/src/components/b2b/BillingOverview.tsx`
-- [ ] Create `/src/components/b2b/InvoiceList.tsx`
+- [x] Create `/src/components/b2b/CampaignEditor.tsx`
+- [x] Create `/src/components/b2b/QuestBuilder.tsx`
+- [x] Create `/src/components/b2b/AnalyticsDashboard.tsx`
+- [x] Create `/src/components/b2b/ConversionFunnel.tsx`
+- [x] Create `/src/components/b2b/AudienceInsights.tsx`
+- [x] Create `/src/components/b2b/ReportBuilder.tsx`
+- [x] Create `/src/components/b2b/BillingOverview.tsx`
+- [x] Create `/src/components/b2b/InvoiceList.tsx`
 
 #### Pages
 
-- [ ] Create `/src/app/(b2b)/campaigns/[id]/page.tsx`
-- [ ] Create `/src/app/(b2b)/campaigns/new/page.tsx`
-- [ ] Create `/src/app/(b2b)/quests/page.tsx`
-- [ ] Create `/src/app/(b2b)/quests/new/page.tsx`
-- [ ] Create `/src/app/(b2b)/analytics/page.tsx`
-- [ ] Create `/src/app/(b2b)/settings/page.tsx`
-- [ ] Create `/src/app/(b2b)/billing/page.tsx`
+- [x] Create `/src/app/(b2b)/campaigns/[id]/page.tsx`
+- [x] Create `/src/app/(b2b)/campaigns/new/page.tsx`
+- [x] Create `/src/app/(b2b)/quests/page.tsx`
+- [x] Create `/src/app/(b2b)/quests/new/page.tsx`
+- [x] Create `/src/app/(b2b)/analytics/page.tsx`
+- [x] Create `/src/app/(b2b)/settings/page.tsx`
+- [x] Create `/src/app/(b2b)/billing/page.tsx`
 
 ### 3.7 Advanced Matching
 
-- [ ] Update matching algorithm with behavioral personas
-- [ ] Add location-based preferences
-- [ ] Implement premium priority matching
-- [ ] Create venue recommendation AI
+- [x] Update matching algorithm with behavioral personas
+- [x] Add location-based preferences
+- [x] Implement premium priority matching
+- [x] Create venue recommendation AI
 
 ### 3.8 Final Integration
 
 - [ ] End-to-end testing for all user flows
 - [ ] B2B workflow testing
 - [ ] Payment flow testing
-- [ ] Database query optimization
+- [x] Database query optimization
 - [ ] API response time audit
 - [ ] Frontend bundle optimization
-- [ ] API documentation (OpenAPI/Swagger)
-- [ ] B2B onboarding guide
-- [ ] Internal developer documentation
+- [x] API documentation (OpenAPI/Swagger)
+- [x] B2B onboarding guide
+- [x] Internal developer documentation
 
 ---
 
