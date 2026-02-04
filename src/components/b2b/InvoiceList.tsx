@@ -1,8 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 interface Invoice {
   id: string;
@@ -74,9 +76,10 @@ export function InvoiceList() {
         ) : (
           <div className="space-y-4">
             {invoices.map((invoice) => (
-              <div
+              <Link
                 key={invoice.id}
-                className="flex items-center justify-between p-4 border rounded-lg"
+                href={`/billing/invoices/${invoice.campaignId}`}
+                className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
               >
                 <div>
                   <p className="font-medium">{invoice.id}</p>
@@ -85,11 +88,14 @@ export function InvoiceList() {
                     {new Date(invoice.invoiceDate).toLocaleDateString()}
                   </p>
                 </div>
-                <div className="text-right">
-                  <p className="font-bold">฿{invoice.amount.toLocaleString()}</p>
-                  {getStatusBadge(invoice.status)}
+                <div className="text-right flex items-center gap-3">
+                  <div>
+                    <p className="font-bold">฿{invoice.amount.toLocaleString()}</p>
+                    {getStatusBadge(invoice.status)}
+                  </div>
+                  <Button variant="ghost" size="sm">View</Button>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}

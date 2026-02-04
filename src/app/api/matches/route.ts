@@ -27,6 +27,8 @@ export async function GET(request: NextRequest) {
         user2_id: row.user2_id,
         compatibility_score: row.compatibility_score,
         status: row.status,
+        chemistry_score: row.chemistry_score,
+        paradise_mode_unlocked: row.paradise_mode_unlocked,
         created_at: row.created_at,
         updated_at: row.updated_at,
         partner: {

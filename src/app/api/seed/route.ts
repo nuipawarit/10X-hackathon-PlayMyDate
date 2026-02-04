@@ -656,6 +656,36 @@ export async function POST(request: NextRequest) {
       `;
     }
 
+    // Match 3: Alice ↔ Grace (Paradise Mode unlocked for demo)
+    const [ag1, ag2] = aliceId < graceId ? [aliceId, graceId] : [graceId, aliceId];
+    await sql`
+      INSERT INTO matches (user1_id, user2_id, compatibility_score, status, chemistry_score, paradise_mode_unlocked, paradise_mode_unlocked_at)
+      VALUES (${ag1}, ${ag2}, 92, 'matched', 120, true, NOW())
+    `;
+
+    const aliceGraceMatch = await sql`
+      SELECT id FROM matches WHERE user1_id = ${ag1} AND user2_id = ${ag2}
+    `;
+
+    if (aliceGraceMatch.rows.length > 0) {
+      const matchId = aliceGraceMatch.rows[0].id;
+
+      await sql`
+        INSERT INTO intimacy_scores (match_id, score, unlocks)
+        VALUES (${matchId}, 90, '["real_name", "photo", "occupation", "call"]'::jsonb)
+        ON CONFLICT (match_id) DO UPDATE SET score = 90, unlocks = '["real_name", "photo", "occupation", "call"]'::jsonb
+      `;
+
+      await sql`
+        INSERT INTO messages (match_id, sender_id, content)
+        VALUES
+          (${matchId}, ${aliceId}, 'Hi Grace! I love that you''re a pastry chef!'),
+          (${matchId}, ${graceId}, 'Thanks Alice! Your travel photos are amazing!'),
+          (${matchId}, ${aliceId}, 'We should try cooking together sometime!'),
+          (${matchId}, ${graceId}, 'Yes! I know some great cafes we could visit')
+      `;
+    }
+
     // Seed activities with coin rewards
     await sql`
       INSERT INTO activities (name, type, description, instructions, intimacy_points, coin_reward, difficulty_level, estimated_duration_minutes, config)

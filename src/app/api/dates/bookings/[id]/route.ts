@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withAuth } from '@/lib/api-auth';
-import { getBookingById, updateBookingStatus, cancelBooking } from '@/lib/services/booking';
+import { getBookingById, updateBookingStatus, cancelBooking, updateSplitBillPreference } from '@/lib/services/booking';
 
 export async function GET(
   request: NextRequest,
@@ -39,6 +39,29 @@ export async function PUT(
     }
 
     return NextResponse.json({ booking: result.data });
+  });
+}
+
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  return withAuth(request, async (userId) => {
+    const { id } = await params;
+    const body = await request.json();
+
+    if (body.splitBillPreference) {
+      const result = await updateSplitBillPreference(id, userId, body.splitBillPreference);
+
+      if (!result.success) {
+        const status = result.code === 'NOT_FOUND' ? 404 : 500;
+        return NextResponse.json({ error: result.error }, { status });
+      }
+
+      return NextResponse.json({ booking: result.data });
+    }
+
+    return NextResponse.json({ error: 'No valid update field provided' }, { status: 400 });
   });
 }
 

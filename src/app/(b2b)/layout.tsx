@@ -83,6 +83,9 @@ export default function B2BLayout({ children }: { children: React.ReactNode }) {
     { href: '/b2b/dashboard', label: 'Dashboard', icon: '📊' },
     { href: '/b2b/campaigns', label: 'Campaigns', icon: '📢' },
     { href: '/b2b/venues', label: 'Venues', icon: '📍' },
+    { href: '/b2b/bookings', label: 'Bookings', icon: '📅' },
+    { href: '/b2b/analytics', label: 'Analytics', icon: '📈' },
+    { href: '/b2b/billing', label: 'Billing', icon: '💳' },
   ];
 
   return (

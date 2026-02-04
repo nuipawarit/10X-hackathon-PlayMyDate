@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { VenueSearch, VenueCard, QRScanner, type VenueSearchFilters } from '@/components/paradise';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 import type { DateVenue } from '@/lib/services/venue';
 
 export default function DatesPage() {
@@ -62,10 +64,18 @@ export default function DatesPage() {
     <div className="container mx-auto py-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Paradise Mode 🌴</h1>
+          <h1 className="text-2xl font-bold">Paradise Mode</h1>
           <p className="text-muted-foreground">
             Discover perfect date spots and earn PlayCoins
           </p>
+        </div>
+        <div className="flex gap-2">
+          <Link href="/dates/venues">
+            <Button variant="outline">Browse All Venues</Button>
+          </Link>
+          <Link href="/dates/bookings">
+            <Button variant="outline">My Bookings</Button>
+          </Link>
         </div>
       </div>
 

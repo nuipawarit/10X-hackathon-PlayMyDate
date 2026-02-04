@@ -182,9 +182,16 @@ export default function Matches() {
                   {partner?.display_name?.[0]?.toUpperCase() || '?'}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-lg text-gray-800">
-                    {partner?.display_name || 'Anonymous'}
-                  </h3>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-semibold text-lg text-gray-800">
+                      {partner?.display_name || 'Anonymous'}
+                    </h3>
+                    {match.paradise_mode_unlocked && (
+                      <span className="text-xs bg-gradient-to-r from-pink-500 to-orange-400 text-white px-2 py-0.5 rounded-full">
+                        🏝️ Paradise
+                      </span>
+                    )}
+                  </div>
                   <p className="text-sm text-gray-500 line-clamp-1">
                     {partner?.bio || 'Ready to connect through activities'}
                   </p>

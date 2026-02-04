@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { lucia, hashPassword } from '@/lib/auth';
 import crypto from 'crypto';
+import { generateReferralCode, applyReferral } from '@/lib/services/referral';
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password, displayName } = await request.json();
+    const { email, password, displayName, referralCode } = await request.json();
 
     if (!email || !password) {
       return NextResponse.json({ error: 'Email and password are required' }, { status: 400 });
@@ -30,6 +31,12 @@ export async function POST(request: NextRequest) {
       INSERT INTO users (id, email, password_hash, display_name)
       VALUES (${userId}, ${email}, ${passwordHash}, ${displayName || null})
     `;
+
+    await generateReferralCode(userId, displayName);
+
+    if (referralCode) {
+      await applyReferral(userId, referralCode);
+    }
 
     const session = await lucia.createSession(userId, {});
     const sessionCookie = lucia.createSessionCookie(session.id);

@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { SplitBillBadge } from '@/components/paradise';
 import type { BookingWithVenue } from '@/lib/services/booking';
 
 export default function BookingsPage() {
@@ -203,6 +204,14 @@ function BookingCard({
             <span className="text-muted-foreground">Confirmation:</span>
             <p className="font-mono font-medium">{booking.confirmation_code}</p>
           </div>
+          {booking.split_bill_preference && (
+            <div>
+              <span className="text-muted-foreground">Split Bill:</span>
+              <div className="mt-1">
+                <SplitBillBadge preference={booking.split_bill_preference} />
+              </div>
+            </div>
+          )}
         </div>
 
         {booking.venue_address && (

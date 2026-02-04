@@ -80,10 +80,28 @@ export function ReportBuilder({ onGenerate }: ReportBuilderProps) {
         </Button>
 
         {generatedReport && (
-          <div className="p-4 bg-muted rounded-lg">
-            <p className="text-sm font-medium">Report Generated</p>
-            <p className="text-xs text-muted-foreground">ID: {generatedReport.id}</p>
-            <p className="text-xs text-muted-foreground">Status: {generatedReport.status}</p>
+          <div className="p-4 bg-muted rounded-lg space-y-3">
+            <div>
+              <p className="text-sm font-medium">Report Generated</p>
+              <p className="text-xs text-muted-foreground">ID: {generatedReport.id}</p>
+              <p className="text-xs text-muted-foreground">Status: {generatedReport.status}</p>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => window.open(`/api/b2b/analytics/reports/${generatedReport.id}/download?format=csv`, '_blank')}
+              >
+                Download CSV
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => window.open(`/api/b2b/analytics/reports/${generatedReport.id}/download?format=html`, '_blank')}
+              >
+                Download HTML
+              </Button>
+            </div>
           </div>
         )}
       </CardContent>

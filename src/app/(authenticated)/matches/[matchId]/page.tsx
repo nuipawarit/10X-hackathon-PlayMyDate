@@ -11,6 +11,7 @@ import {
   Partner,
   Activity,
   Intimacy,
+  Match,
 } from '@/lib/api';
 import { useAuth } from '@/components/AuthProvider';
 import { useRealtimeMessages } from '@/hooks/useRealtimeMessages';
@@ -29,6 +30,7 @@ export default function MatchDetail() {
   const matchId = params.matchId;
   const { user, isLoading: authLoading } = useAuth();
   const [partner, setPartner] = useState<Partner | null>(null);
+  const [match, setMatch] = useState<Match | null>(null);
   const [newMessage, setNewMessage] = useState('');
   const [intimacy, setIntimacy] = useState<Intimacy | null>(null);
   const [activities, setActivities] = useState<Activity[]>([]);
@@ -58,6 +60,7 @@ export default function MatchDetail() {
         getAvailableActivities(),
       ]);
 
+      setMatch(matchRes.data.match);
       setPartner(matchRes.data.partner);
       setIntimacy(intimacyRes.data);
       setActivities(activitiesRes.data);
@@ -191,6 +194,29 @@ export default function MatchDetail() {
                 </button>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* Paradise Mode */}
+        {match?.paradise_mode_unlocked && (
+          <div className="mt-4 pt-4 border-t border-gray-100 animate-bounce-in">
+            <Link
+              href="/dates"
+              className="block w-full p-4 bg-gradient-to-r from-pink-500 to-orange-400 rounded-xl hover:from-pink-600 hover:to-orange-500 transition-all"
+            >
+              <div className="flex items-center justify-between text-white">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">🏝️</span>
+                  <div>
+                    <div className="font-semibold">Paradise Mode Unlocked!</div>
+                    <div className="text-sm text-white/80">Plan a date together</div>
+                  </div>
+                </div>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </Link>
           </div>
         )}
 

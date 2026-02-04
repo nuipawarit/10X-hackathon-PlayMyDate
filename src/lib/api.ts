@@ -34,6 +34,8 @@ export type Match = {
   user2_id: string;
   compatibility_score: number;
   status: string;
+  chemistry_score?: number;
+  paradise_mode_unlocked?: boolean;
   created_at: string;
   updated_at: string;
 };
@@ -186,7 +188,7 @@ export const saveAvatar = async (avatarConfig: AvatarConfig) => {
 
 // Matches
 export const getMatches = async () => {
-  const data = await fetchApi<{ matches: Array<{ id: string; user1_id: string; user2_id: string; compatibility_score: number; status: string; created_at: string; updated_at: string; partner: Partner }> }>('/api/matches');
+  const data = await fetchApi<{ matches: Array<{ id: string; user1_id: string; user2_id: string; compatibility_score: number; status: string; chemistry_score?: number; paradise_mode_unlocked?: boolean; created_at: string; updated_at: string; partner: Partner }> }>('/api/matches');
   const matchesWithPartners = data.matches.map((m) => ({
     match: {
       id: m.id,
@@ -194,6 +196,8 @@ export const getMatches = async () => {
       user2_id: m.user2_id,
       compatibility_score: m.compatibility_score,
       status: m.status,
+      chemistry_score: m.chemistry_score,
+      paradise_mode_unlocked: m.paradise_mode_unlocked,
       created_at: m.created_at,
       updated_at: m.updated_at,
     } as Match,
@@ -219,6 +223,8 @@ export const getMatch = async (matchId: string) => {
         user2_id: data.match.user2_id,
         compatibility_score: data.match.compatibility_score,
         status: data.match.status,
+        chemistry_score: data.match.chemistry_score,
+        paradise_mode_unlocked: data.match.paradise_mode_unlocked,
         created_at: data.match.created_at,
         updated_at: data.match.updated_at,
       } as Match,

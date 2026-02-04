@@ -4,3 +4,5 @@ export { VenueDetail } from './VenueDetail';
 export { BookingForm, type BookingFormData } from './BookingForm';
 export { BookingConfirmation } from './BookingConfirmation';
 export { QRScanner } from './QRScanner';
+export { SplitBillSelector } from './SplitBillSelector';
+export { SplitBillBadge } from './SplitBillBadge';

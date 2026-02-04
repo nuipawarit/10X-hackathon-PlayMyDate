@@ -1,18 +1,28 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/components/AuthProvider';
+import { ReferralCodeInput } from '@/components/referral';
 
-export default function Register() {
+function RegisterForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
+  const [referralCode, setReferralCode] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { register, user, isLoading } = useAuth();
+  const { user, isLoading } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const refCode = searchParams.get('ref');
+    if (refCode) {
+      setReferralCode(refCode.toUpperCase());
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (!isLoading && user) {
@@ -26,8 +36,25 @@ export default function Register() {
     setLoading(true);
 
     try {
-      await register(email, password, displayName || undefined);
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          email,
+          password,
+          displayName: displayName || undefined,
+          referralCode: referralCode || undefined,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Registration failed');
+      }
+
       router.push('/profile');
+      router.refresh();
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Registration failed';
       setError(message);
@@ -119,6 +146,10 @@ export default function Register() {
             />
           </div>
 
+          <div className="animate-slide-up" style={{ animationDelay: '0.35s' }}>
+            <ReferralCodeInput value={referralCode} onChange={setReferralCode} />
+          </div>
+
           <button
             type="submit"
             disabled={loading}
@@ -145,5 +176,17 @@ export default function Register() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function Register() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500" />
+      </div>
+    }>
+      <RegisterForm />
+    </Suspense>
   );
 }

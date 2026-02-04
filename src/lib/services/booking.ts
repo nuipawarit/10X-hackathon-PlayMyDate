@@ -217,6 +217,38 @@ export async function cancelBooking(
   }
 }
 
+export async function updateSplitBillPreference(
+  bookingId: string,
+  userId: string,
+  preference: string
+): Promise<ServiceResult<DateBooking>> {
+  try {
+    const checkResult = await sql`
+      SELECT b.* FROM date_bookings b
+      JOIN matches m ON b.match_id = m.id
+      WHERE b.id = ${bookingId}
+      AND (m.user1_id = ${userId} OR m.user2_id = ${userId})
+      AND b.status NOT IN ('cancelled', 'completed')
+    `;
+
+    if (checkResult.rows.length === 0) {
+      return failure('Booking not found or cannot be updated', 'NOT_FOUND');
+    }
+
+    const result = await sql`
+      UPDATE date_bookings
+      SET split_bill_preference = ${preference}, updated_at = NOW()
+      WHERE id = ${bookingId}
+      RETURNING *
+    `;
+
+    return success(result.rows[0] as DateBooking);
+  } catch (error) {
+    console.error('updateSplitBillPreference error:', error);
+    return failure('Failed to update split bill preference', 'INTERNAL_ERROR');
+  }
+}
+
 const QR_CHECKIN_COINS = 50;
 
 export async function performQRCheckin(

@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { TargetAudienceSelector, type TargetAudience } from './TargetAudienceSelector';
 import type { Campaign, CreateCampaignInput } from '@/lib/services/campaign';
 
 interface CampaignEditorProps {
@@ -25,6 +26,7 @@ export function CampaignEditor({ campaign, onSave }: CampaignEditorProps) {
     cpmiRate: campaign?.cpmi_rate ? parseFloat(campaign.cpmi_rate) : undefined,
     startDate: campaign?.start_date ? new Date(campaign.start_date).toISOString().split('T')[0] : '',
     endDate: campaign?.end_date ? new Date(campaign.end_date).toISOString().split('T')[0] : '',
+    targetAudience: (campaign?.target_audience as Record<string, unknown>) || {},
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -134,6 +136,11 @@ export function CampaignEditor({ campaign, onSave }: CampaignEditorProps) {
               />
             </div>
           </div>
+
+          <TargetAudienceSelector
+            value={formData.targetAudience || {}}
+            onChange={(audience) => setFormData({ ...formData, targetAudience: audience as Record<string, unknown> })}
+          />
 
           <div className="flex gap-4 pt-4">
             <Button type="submit" disabled={loading}>

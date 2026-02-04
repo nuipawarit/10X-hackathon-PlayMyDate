@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { WalletBalance, TransactionHistory, DailyCheckin } from '@/components/wallet';
+import { ReferralCard } from '@/components/referral';
 import { Button } from '@/components/ui/button';
 
 export default function WalletPage() {
@@ -10,13 +11,15 @@ export default function WalletPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">My Wallet</h1>
         <Link href="/rewards">
-          <Button variant="outline">🎁 Rewards Shop</Button>
+          <Button variant="outline">Rewards Shop</Button>
         </Link>
       </div>
 
       <WalletBalance showLifetime />
 
       <DailyCheckin />
+
+      <ReferralCard />
 
       <TransactionHistory />
     </div>

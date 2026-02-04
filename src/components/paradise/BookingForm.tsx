@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { SplitBillSelector } from './SplitBillSelector';
 
 interface BookingFormProps {
   matchId: string;
@@ -119,19 +120,10 @@ export function BookingForm({
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="splitBill">Split Bill Preference</Label>
-            <Select value={splitBillPreference} onValueChange={setSplitBillPreference}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select preference" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="split">Split evenly</SelectItem>
-                <SelectItem value="treat">I will treat</SelectItem>
-                <SelectItem value="decide_later">Decide later</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <SplitBillSelector
+            value={splitBillPreference}
+            onChange={setSplitBillPreference}
+          />
 
           <div className="space-y-2">
             <Label htmlFor="requests">Special Requests</Label>
